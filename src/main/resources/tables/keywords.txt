@@ -1,0 +1,15 @@
+1	let
+2	boolean
+3	integer
+4	real
+5	end
+6	if
+7	then
+8	else
+9	end else
+10	for
+11	do while
+12	loop
+13	input
+14	output
+
