@@ -4,6 +4,7 @@ import edu.psuti.alexandrov.parse.Parsing;
 
 public enum LexType {
 
+    UNKNOWN(0, Parsing.EMPTY),
     KEYWORD(1, "\\w+"),
     DELIMITER(2, Parsing.DIRTY_LEX_SPLIT),
     IDENTIFIER(3, "[a-zA-Z][\\w]*"),

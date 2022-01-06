@@ -30,7 +30,7 @@ public abstract class LexemTable extends SelfParcing<Lexem> {
 
     @Override
     public Lexem map(String sample) {
-        return new Lexem(IntSequence.next(), sample);
+        return new Lexem(sample);
     }
 
     public Optional<LexUnit> find(LexType type, String value) {

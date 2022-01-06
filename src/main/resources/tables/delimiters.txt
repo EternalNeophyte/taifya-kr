@@ -14,7 +14,9 @@
 14	>=
 15		*
 16		/
-17		plus
-18		minus
+17		(
+18		)
+19		plus
+20		minus
 19		and
 20		or
