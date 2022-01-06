@@ -1,4 +1,6 @@
-package edu.psuti.alexandrov.struct;
+package edu.psuti.alexandrov.parse.impl;
+
+import edu.psuti.alexandrov.parse.SelfParcing;
 
 import java.util.List;
 

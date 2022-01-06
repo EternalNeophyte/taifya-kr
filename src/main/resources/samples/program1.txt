@@ -1,5 +1,8 @@
-counter: integer;
-{ Комментарий }
-for(counter = 0; counter < 10; counter = counter + 1)
-    if counter == 5 then output(counter);
+    counter: integer;
+    {
+        Комментарий
+    }
+    for(counter = 0; counter < 10h; counter = counter + 1B)
+        if counter == 5o then output(counter);
+    loop
 end

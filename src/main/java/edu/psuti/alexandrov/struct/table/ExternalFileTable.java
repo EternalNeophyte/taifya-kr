@@ -1,6 +1,6 @@
 package edu.psuti.alexandrov.struct.table;
 
-import edu.psuti.alexandrov.struct.Lexem;
+import edu.psuti.alexandrov.struct.lex.Lexem;
 import edu.psuti.alexandrov.util.IOUtil;
 
 public class ExternalFileTable extends LexemTable {
@@ -9,7 +9,6 @@ public class ExternalFileTable extends LexemTable {
         super(source);
     }
 
-    //"s:(\n)|(\r\n)"
     @Override
     public String mask() {
         return SPLIT_SIGN + LINE_WRAP;

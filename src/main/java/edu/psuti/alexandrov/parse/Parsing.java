@@ -1,4 +1,4 @@
-package edu.psuti.alexandrov.struct;
+package edu.psuti.alexandrov.parse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,17 +6,15 @@ import java.util.function.Supplier;
 
 public interface Parsing<T> {
 
-    String OR = "|";
-    String SPLIT_SIGN = "s:";
-    String SPACES = "\\s+";
-
     String EMPTY = "";
-    String LEX_DELIMITER = "%";
-    String DIRTY_LEX_SPLIT = "\\w+|[\\W&&[^%]]{0,2}|" + LEX_DELIMITER;
+    String OR = "|";
+    String SPACES = "\\s+";
     String LINE_WRAP = "\n|\r\n";
+    String SPLIT_SIGN = "s:";
+    String LEX_DELIMITER = "%";
+    String DIRTY_LEX_SPLIT = "\\w+|[\\W&&[^" + LEX_DELIMITER + "]]{0,2}";
 
-    String IDENTIFIER = "[a-zA-Z][\\w]*";
-    String FLOAT = "[\\d]*[.][\\d]+";
+    String FLOAT = "[\\d]*[.][\\d]+([eE]?|[eE][+-]?)";
     String BINARY = "[01]+[Bb]";
     String OCTET = "[0-7]+[Oo]";
     String DECIMAL = "[\\d]+[Dd]?";

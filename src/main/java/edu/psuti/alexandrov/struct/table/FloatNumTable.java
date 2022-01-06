@@ -2,14 +2,14 @@ package edu.psuti.alexandrov.struct.table;
 
 import edu.psuti.alexandrov.struct.lex.LexType;
 
-public class IdentifiersTable extends LexemTable {
+public class FloatNumTable extends LexemTable {
 
-    public IdentifiersTable(String source) {
+    public FloatNumTable(String source) {
         super(source);
     }
 
     @Override
     public String mask() {
-        return LexType.IDENTIFIER.mask();
+        return LexType.FLOAT_NUM.mask();
     }
 }

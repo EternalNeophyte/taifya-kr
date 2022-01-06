@@ -1,4 +1,4 @@
-import edu.psuti.alexandrov.lexem.LexicAnalyzer;
+import edu.psuti.alexandrov.parse.impl.LexicAnalyzer;
 import edu.psuti.alexandrov.struct.table.ExternalFileTable;
 import edu.psuti.alexandrov.util.IOUtil;
 import org.junit.jupiter.api.Test;
@@ -65,8 +65,8 @@ public class ParcingTest {
 
     @Test
     public void testAlternation() {
-        String line = "kytferrum rkbmo ";
-        Matcher m = Pattern.compile("rest|ferrum").matcher(line);
+        String line = "0.5436";
+        Matcher m = Pattern.compile("^[\\d]*[.][\\d]+([eE]?|[eE][+-]?)$").matcher(line);
         assertTrue(m.find());
     }
 
