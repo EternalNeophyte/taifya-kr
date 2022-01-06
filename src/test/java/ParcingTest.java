@@ -36,7 +36,6 @@ public class ParcingTest {
 
     @Test
     public void testFloatAlternation() {
-        //ToDo решить проблему с парсингом чисел
         Pattern pattern = Pattern.compile("^[\\d]*[.][\\d]+$|^[\\da-fA-F]+[Hh]$");
         String sample1 = "4.7558578";
         String sample2 = ".7558578";

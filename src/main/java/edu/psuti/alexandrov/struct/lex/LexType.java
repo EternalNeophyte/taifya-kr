@@ -6,7 +6,7 @@ public enum LexType {
 
     UNKNOWN(0, Parsing.EMPTY),
     KEYWORD(1, "\\w+"),
-    DELIMITER(2, Parsing.DIRTY_LEX_SPLIT),
+    DELIMITER(2, "\\w+|[\\W&&[^" + Parsing.LEX_DELIMITER + "]]{0,2}"),
     IDENTIFIER(3, "[a-zA-Z][\\w]*"),
     BINARY_NUM(4, "[01]+[Bb]"),
     OCTET_NUM(4, "[0-7]+[Oo]"),

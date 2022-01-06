@@ -2,11 +2,13 @@ package edu.psuti.alexandrov.parse.impl;
 
 import edu.psuti.alexandrov.parse.SelfParcing;
 import edu.psuti.alexandrov.struct.lex.LexUnit;
+import edu.psuti.alexandrov.struct.lex.Lexem;
 import edu.psuti.alexandrov.struct.table.*;
 import edu.psuti.alexandrov.util.IOUtil;
 
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static edu.psuti.alexandrov.struct.lex.LexType.*;
 
@@ -34,7 +36,14 @@ public class LexAnalyzer extends SelfParcing<String> {
 
     @Override
     public String mask() {
-        return DIRTY_LEX_SPLIT;
+        try(Stream<Lexem> lexems = delimiters.content()) {
+            return "\\w+" + OR + lexems
+                    .map(lex -> {
+                        String value = lex.value();
+                        return value.length() == 1 ? SCREEN + value : value;
+                    })
+                    .collect(Collectors.joining(OR));
+        }
     }
 
     @Override
@@ -51,7 +60,6 @@ public class LexAnalyzer extends SelfParcing<String> {
     public Stream<LexUnit> lexUnits() {
         prepareContent();
         return content()
-                .filter(lex -> !lex.equals(EMPTY))
                 .map(lex -> keywords.find(KEYWORD, lex)
                     .or(() -> delimiters.find(DELIMITER, lex))
                     .or(() -> identifiers.find(IDENTIFIER, lex))
