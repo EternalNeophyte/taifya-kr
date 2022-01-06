@@ -1,10 +1,7 @@
 package edu.psuti.alexandrov.struct.table;
 
 import edu.psuti.alexandrov.struct.Lexem;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import edu.psuti.alexandrov.util.IOUtil;
 
 public class ExternalFileTable extends LexemTable {
 
@@ -12,19 +9,15 @@ public class ExternalFileTable extends LexemTable {
         super(source);
     }
 
+    //"s:(\n)|(\r\n)"
     @Override
     public String mask() {
-        return "s:(\n)|(\r\n)";
+        return SPLIT_SIGN + LINE_WRAP;
     }
 
     @Override
     public String input() {
-        try {
-            return Files.readString(Path.of(source));
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return IOUtil.readTxt(source);
     }
 
     @Override

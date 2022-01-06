@@ -16,6 +16,6 @@ public class NumbersTable extends LexemTable {
 
     @Override
     public String mask() {
-        return "[\\d]*[.][\\d]+|[\\da-fA-F]+";
+        return String.join(OR, FLOAT, BINARY, OCTET, DECIMAL, HEX);
     }
 }

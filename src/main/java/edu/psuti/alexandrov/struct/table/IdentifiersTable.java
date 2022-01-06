@@ -16,6 +16,6 @@ public class IdentifiersTable extends LexemTable {
 
     @Override
     public String mask() {
-        return "[a-zA-Z][\\w]*";
+        return IDENTIFIER;
     }
 }
