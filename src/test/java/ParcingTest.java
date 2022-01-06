@@ -1,4 +1,4 @@
-import edu.psuti.alexandrov.parse.impl.LexicAnalyzer;
+import edu.psuti.alexandrov.parse.impl.LexAnalyzer;
 import edu.psuti.alexandrov.struct.table.ExternalFileTable;
 import edu.psuti.alexandrov.util.IOUtil;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ public class ParcingTest {
 
     @Test
     public void testAnalyzer() {
-        LexicAnalyzer analyzer = new LexicAnalyzer();
+        LexAnalyzer analyzer = new LexAnalyzer();
         var s = analyzer.lexUnits();
         s.forEach(System.out::println);
     }

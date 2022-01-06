@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import static edu.psuti.alexandrov.struct.lex.LexType.*;
 
-public class LexicAnalyzer extends SelfParcing<String> {
+public class LexAnalyzer extends SelfParcing<String> {
 
     private final ExternalFileTable keywords;
     private final ExternalFileTable delimiters;
@@ -20,9 +20,9 @@ public class LexicAnalyzer extends SelfParcing<String> {
     private final DecimalNumTable decimals;
     private final FloatNumTable floats;
 
-    public LexicAnalyzer() {
-        keywords = new ExternalFileTable("tables//keywords");
-        delimiters = new ExternalFileTable("tables//delimiters");
+    public LexAnalyzer() {
+        keywords = new ExternalFileTable("tables\\keywords");
+        delimiters = new ExternalFileTable("tables\\delimiters");
         identifiers = new IdentifiersTable(input());
         binaries = new BinaryNumTable(input());
         octets = new OctetNumTable(input());
