@@ -12,7 +12,7 @@ public enum LexType {
     OCTET_NUM(4, "[0-7]+[Oo]"),
     HEX_NUM(4,"[\\da-fA-F]+[Hh]"),
     DECIMAL_NUM(4, "[\\d]+[Dd]?"),
-    FLOAT_NUM(4, "[\\d]*[.][\\d]+([eE]?|[eE][+-]?)");
+    FLOAT_NUM(4, "[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]");
 
     LexType(int tableNum, String mask) {
         this.tableNum = tableNum;
