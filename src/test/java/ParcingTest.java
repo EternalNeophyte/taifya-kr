@@ -1,7 +1,6 @@
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.exp.Expressions;
-import edu.psuti.alexandrov.exp.MatchingType;
-import edu.psuti.alexandrov.parse.impl.LexAnalyzer;
+import edu.psuti.alexandrov.lex.LexAnalyzer;
 import edu.psuti.alexandrov.struct.table.ExternalFileTable;
 import edu.psuti.alexandrov.util.IOUtil;
 import edu.psuti.alexandrov.exp.pattern.WalkPattern;

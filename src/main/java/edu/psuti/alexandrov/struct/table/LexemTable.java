@@ -1,9 +1,9 @@
 package edu.psuti.alexandrov.struct.table;
 
-import edu.psuti.alexandrov.struct.lex.LexType;
-import edu.psuti.alexandrov.struct.lex.LexUnit;
-import edu.psuti.alexandrov.struct.lex.Lexem;
-import edu.psuti.alexandrov.parse.SelfParcing;
+import edu.psuti.alexandrov.lex.LexType;
+import edu.psuti.alexandrov.lex.LexUnit;
+import edu.psuti.alexandrov.lex.Lexem;
+import edu.psuti.alexandrov.struct.SelfParcing;
 import edu.psuti.alexandrov.util.IntSequence;
 
 import java.util.Optional;

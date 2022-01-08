@@ -1,7 +1,7 @@
-package edu.psuti.alexandrov.struct.lex;
+package edu.psuti.alexandrov.lex;
 
 import edu.psuti.alexandrov.exp.Expression;
-import edu.psuti.alexandrov.parse.Parsing;
+import edu.psuti.alexandrov.struct.Parsing;
 
 public enum LexType {
 

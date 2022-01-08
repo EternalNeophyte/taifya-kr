@@ -1,4 +1,4 @@
-package edu.psuti.alexandrov.parse;
+package edu.psuti.alexandrov.struct;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package edu.psuti.alexandrov.struct.table;
 
-import edu.psuti.alexandrov.struct.lex.LexType;
+import edu.psuti.alexandrov.lex.LexType;
 
 public class IdentifiersTable extends LexemTable {
 

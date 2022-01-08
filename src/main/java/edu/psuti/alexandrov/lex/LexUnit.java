@@ -1,4 +1,4 @@
-package edu.psuti.alexandrov.struct.lex;
+package edu.psuti.alexandrov.lex;
 
 public record LexUnit(LexType type, Lexem lexem) {
 

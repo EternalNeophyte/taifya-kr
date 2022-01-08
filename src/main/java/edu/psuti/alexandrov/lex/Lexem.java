@@ -1,4 +1,4 @@
-package edu.psuti.alexandrov.struct.lex;
+package edu.psuti.alexandrov.lex;
 
 import edu.psuti.alexandrov.util.IntSequence;
 

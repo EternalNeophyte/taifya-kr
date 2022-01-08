@@ -1,8 +1,6 @@
-package edu.psuti.alexandrov.parse.impl;
+package edu.psuti.alexandrov.lex;
 
-import edu.psuti.alexandrov.parse.SelfParcing;
-import edu.psuti.alexandrov.struct.lex.LexUnit;
-import edu.psuti.alexandrov.struct.lex.Lexem;
+import edu.psuti.alexandrov.struct.SelfParcing;
 import edu.psuti.alexandrov.struct.table.*;
 import edu.psuti.alexandrov.util.IOUtil;
 
@@ -10,7 +8,8 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import static edu.psuti.alexandrov.struct.lex.LexType.*;
+
+import static edu.psuti.alexandrov.lex.LexType.*;
 
 public class LexAnalyzer extends SelfParcing<String> {
 

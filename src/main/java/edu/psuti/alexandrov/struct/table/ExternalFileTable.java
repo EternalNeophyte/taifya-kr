@@ -1,6 +1,6 @@
 package edu.psuti.alexandrov.struct.table;
 
-import edu.psuti.alexandrov.struct.lex.Lexem;
+import edu.psuti.alexandrov.lex.Lexem;
 import edu.psuti.alexandrov.util.IOUtil;
 
 public class ExternalFileTable extends LexemTable {
