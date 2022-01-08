@@ -1,24 +1,15 @@
 package edu.psuti.alexandrov.exp.pattern;
 
-import edu.psuti.alexandrov.exp.Prediction;
-
-import java.util.List;
 import java.util.function.Predicate;
 
-public class RepeatablePattern<T> extends WalkPattern<T> {
+public class RepeatablePattern<T> extends AbstractRepeatablePattern<T> {
 
-    RepeatablePattern(Predicate<T> predicate) {
-        super(predicate);
+    RepeatablePattern(Predicate<T> predicate, T[] row) {
+        super(predicate, row);
     }
 
     @Override
-    Prediction retrieve(int index, List<T> values) {
-        int initial = index;
-        while(test(index, values)) {
-            System.out.println("Maybe repeatable index = " + index + ", value = " + values.get(index));
-            index++;
-        }
-        boolean result = index > initial;
-        return new Prediction(result ? index : initial + 1, result);
+    boolean mergeConditions(boolean main, boolean additional) {
+        return main && additional;
     }
 }

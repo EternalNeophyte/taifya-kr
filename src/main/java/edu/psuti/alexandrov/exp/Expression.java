@@ -1,7 +1,8 @@
 package edu.psuti.alexandrov.exp;
 
-import edu.psuti.alexandrov.exp.pattern.WalkPattern;
+import edu.psuti.alexandrov.exp.pattern.*;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -11,8 +12,12 @@ public class Expression<T> {
 
     private final List<WalkPattern<T>> patterns;
 
-    private Expression() {
+    Expression() {
         patterns = new LinkedList<>();
+    }
+
+    public Stream<WalkPattern<T>> patterns() {
+        return patterns.stream();
     }
 
     public static <T> Predicate<T> in(T[] values) {
@@ -44,39 +49,50 @@ public class Expression<T> {
 
     @SafeVarargs
     public final Expression<T> many(T... values) {
-        patterns.add(WalkPattern.repeatable(in(values)));
+        patterns.add(WalkPattern.multiple(in(values)));
         return this;
     }
 
     @SafeVarargs
     public final Expression<T> maybeMany(T... values) {
-        patterns.add(WalkPattern.maybeRepeatable(in(values)));
+        patterns.add(WalkPattern.maybeMultiple(in(values)));
         return this;
     }
 
-    public final Expression<T> one(Expression<T> other) {
-
+    @SafeVarargs
+    public final Expression<T> carousel(T... values) {
+        patterns.add(WalkPattern.repeatable(in(values), values));
         return this;
     }
 
-    public final Expression<T> maybeOne(Expression<T> other) {
-
+    @SafeVarargs
+    public final Expression<T> maybeCarousel(T... values) {
+        patterns.add(WalkPattern.maybeRepeatable(in(values), values));
         return this;
+    }
+
+    @SafeVarargs
+    public final Matching compute(T... values) {
+        return compute(Arrays.asList(values));
     }
 
     public Matching compute(List<T> values) {
-        try(Stream<WalkPattern<T>> stream = patterns.stream()) {
-            Prediction result = stream.reduce(
+        try(Stream<WalkPattern<T>> patterns = patterns()) {
+            Prediction result = patterns.reduce(
                     Prediction.DUMMY,
-                    (prediction, pattern) -> pattern.walk(prediction.index(), values),
+                    (prediction, pattern) -> {
+                        Prediction next = pattern.walk(prediction.index(), values);
+                        if(!next.condition()) {
+                            throw new SkipMergingException(next);
+                        }
+                        return next;
+                    },
                     Prediction::merge
             );
-            boolean condition = result.condition();
-            return condition && result.index() == values.size()
-                    ? Matching.COMPLETE
-                    : condition
-                        ? Matching.PARTIAL
-                        : Matching.NO;
+            return new Matching(result, values.size());
+        }
+        catch (SkipMergingException e) {
+            return new Matching(e.transported(), values.size());
         }
     }
 }

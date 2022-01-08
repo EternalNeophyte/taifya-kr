@@ -13,16 +13,10 @@ public abstract class WalkPattern<T> {
         this.predicate = predicate;
     }
 
-    abstract Prediction retrieve(int index, List<T> values);
+    public abstract Prediction walk(int index, List<T> values);
 
-    boolean test(int index, List<T> values) {
-        return predicate.test(values.get(index));
-    }
-
-    public Prediction walk(int index, List<T> values) {
-        return index >= values.size()
-                ? new Prediction(index - 1, true)
-                : retrieve(index, values);
+    boolean canStep(int index, List<T> values) {
+        return index < values.size() && predicate.test(values.get(index));
     }
 
     public static <T> UniquePattern<T> unique(Predicate<T> predicate) {
@@ -33,12 +27,20 @@ public abstract class WalkPattern<T> {
         return new MaybeUniquePattern<>(predicate);
     }
 
-    public static <T> RepeatablePattern<T> repeatable(Predicate<T> predicate) {
-        return new RepeatablePattern<>(predicate);
+    public static <T> MultiplePattern<T> multiple(Predicate<T> predicate) {
+        return new MultiplePattern<>(predicate);
     }
 
-    public static <T> MaybeRepeatablePattern<T> maybeRepeatable(Predicate<T> predicate) {
-        return new MaybeRepeatablePattern<>(predicate);
+    public static <T> MaybeMultiplePattern<T> maybeMultiple(Predicate<T> predicate) {
+        return new MaybeMultiplePattern<>(predicate);
+    }
+
+    public static <T> RepeatablePattern<T> repeatable(Predicate<T> predicate, T[] row) {
+        return new RepeatablePattern<>(predicate, row);
+    }
+
+    public static <T> MaybeRepeatablePattern<T> maybeRepeatable(Predicate<T> predicate, T[] row) {
+        return new MaybeRepeatablePattern<>(predicate, row);
     }
 
 }

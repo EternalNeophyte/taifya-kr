@@ -1,5 +1,6 @@
 import edu.psuti.alexandrov.exp.Expression;
-import edu.psuti.alexandrov.exp.Matching;
+import edu.psuti.alexandrov.exp.Expressions;
+import edu.psuti.alexandrov.exp.MatchingType;
 import edu.psuti.alexandrov.parse.impl.LexAnalyzer;
 import edu.psuti.alexandrov.struct.table.ExternalFileTable;
 import edu.psuti.alexandrov.util.IOUtil;
@@ -7,7 +8,6 @@ import edu.psuti.alexandrov.exp.pattern.WalkPattern;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,20 +75,29 @@ public class ParcingTest {
 
     @Test
     public void testRepeatedPattern() {
-        WalkPattern<Integer> p = WalkPattern.repeatable(i -> i == 2);
-        var pr = p.walk(0, List.of(2, 2, 2, 0, 2));
-        pr.toString();
+        Integer[] row = {1, 2, 3};
+        WalkPattern<Integer> p = WalkPattern.repeatable(Expression.in(row), row);
+        var m = Expression.<Integer>start()
+                .maybeOne(7)
+                .maybeOne(9)
+                .one(7)
+                .carousel(1, 2, 5)
+                .maybeOne(7)
+                .maybeOne(8)
+                .maybeOne(5)
+                .compute(7, 9, 1, 2, 5);
+        m.toString();
     }
 
     @Test
     public void testExpMatching() {
         var m = Expression.<Integer>start()
                 .one(8)
-                .one(6, 7, 8)
-                .many(3, 5)
-                .maybeOne(9)
-                .compute(List.of(8, 7, 3, 3, 5, 3, 9));
-        assertEquals(Matching.PARTIAL, m);
+                .one(7)
+                .maybeMany(3, 5)
+                .one(9)
+                .compute(8, 7, 3, 3, 5, 3, 9);
+        m.toString();
     }
 
 }

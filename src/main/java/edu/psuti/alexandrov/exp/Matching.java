@@ -1,8 +1,24 @@
 package edu.psuti.alexandrov.exp;
 
-public enum Matching {
+public class Matching {
 
-    COMPLETE,
-    PARTIAL,
-    NO;
+    private final int index;
+    private final MatchingType type;
+
+    public Matching(Prediction prediction, int bound) {
+        this.index = prediction.index() - 1;
+        this.type = prediction.condition()
+                ? index == bound - 1
+                        ? MatchingType.COMPLETE
+                        : MatchingType.PARTIAL
+                : MatchingType.NO;
+    }
+
+    public int index() {
+        return index;
+    }
+
+    public MatchingType type() {
+        return type;
+    }
 }

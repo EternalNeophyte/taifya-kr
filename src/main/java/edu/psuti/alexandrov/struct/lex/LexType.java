@@ -1,5 +1,6 @@
 package edu.psuti.alexandrov.struct.lex;
 
+import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.parse.Parsing;
 
 public enum LexType {
@@ -28,5 +29,9 @@ public enum LexType {
 
     public String mask() {
         return mask;
+    }
+
+    public static Expression<LexType> expression() {
+        return Expression.start();
     }
 }
