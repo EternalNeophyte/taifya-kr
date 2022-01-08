@@ -18,9 +18,8 @@ public abstract class LexemTable extends SelfParcing<Lexem> {
     }
 
     @Override
-    protected void parseSelf() {
-        super.parseSelf();
-        IntSequence.reset();
+    public String mask() {
+        return lexType().mask();
     }
 
     @Override
@@ -33,10 +32,20 @@ public abstract class LexemTable extends SelfParcing<Lexem> {
         return new Lexem(sample);
     }
 
-    public Optional<LexUnit> find(LexType type, String value) {
+    @Override
+    protected void parseSelf() {
+        super.parseSelf();
+        IntSequence.reset();
+    }
+
+    public LexType lexType() {
+        return LexType.UNKNOWN;
+    }
+
+    public Optional<LexUnit> find(String value) {
         for(Lexem lexem : content) {
             if(lexem.value().equals(value)) {
-                return Optional.of(new LexUnit(type, lexem));
+                return Optional.of(new LexUnit(lexType(), lexem));
             }
         }
         return Optional.empty();

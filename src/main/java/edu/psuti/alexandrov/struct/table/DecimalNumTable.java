@@ -9,7 +9,7 @@ public class DecimalNumTable extends LexemTable {
     }
 
     @Override
-    public String mask() {
-        return LexType.DECIMAL_NUM.mask();
+    public LexType lexType() {
+        return LexType.DECIMAL_NUM;
     }
 }

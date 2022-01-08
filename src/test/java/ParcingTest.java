@@ -1,5 +1,4 @@
 import edu.psuti.alexandrov.exp.Expression;
-import edu.psuti.alexandrov.exp.Expressions;
 import edu.psuti.alexandrov.lex.LexAnalyzer;
 import edu.psuti.alexandrov.struct.table.ExternalFileTable;
 import edu.psuti.alexandrov.util.IOUtil;

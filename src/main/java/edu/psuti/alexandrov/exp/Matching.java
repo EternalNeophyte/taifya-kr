@@ -1,6 +1,6 @@
 package edu.psuti.alexandrov.exp;
 
-public class Matching {
+public class Matching implements Comparable<Matching> {
 
     private final int index;
     private final MatchingType type;
@@ -20,5 +20,10 @@ public class Matching {
 
     public MatchingType type() {
         return type;
+    }
+
+    @Override
+    public int compareTo(Matching other) {
+        return Integer.compare(this.type.priority(), other.type.priority());
     }
 }

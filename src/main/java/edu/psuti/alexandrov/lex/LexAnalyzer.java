@@ -58,8 +58,8 @@ public class LexAnalyzer extends SelfParcing<String> {
 
     public Stream<LexUnit> lexUnits() {
         prepareContent();
-        return content()
-                .map(lex -> keywords.find(KEYWORD, lex)
+        return content()      //ToDo WIP
+                .map(lex -> null/*keywords.find(KEYWORD, lex)
                     .or(() -> delimiters.find(DELIMITER, lex))
                     .or(() -> identifiers.find(IDENTIFIER, lex))
                     .or(() -> binaries.find(BINARY_NUM, lex))
@@ -67,7 +67,7 @@ public class LexAnalyzer extends SelfParcing<String> {
                     .or(() -> hexs.find(HEX_NUM, lex))
                     .or(() -> decimals.find(DECIMAL_NUM, lex))
                     .or(() -> floats.find(FLOAT_NUM, lex))
-                    .orElse(LexUnit.unknown(lex))
+                    .orElse(LexUnit.unknown(lex)*/
                 );
     }
 

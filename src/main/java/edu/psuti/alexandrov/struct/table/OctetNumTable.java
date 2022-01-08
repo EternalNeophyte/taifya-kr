@@ -10,7 +10,7 @@ public class OctetNumTable extends LexemTable {
     }
 
     @Override
-    public String mask() {
-        return LexType.OCTET_NUM.mask();
+    public LexType lexType() {
+        return LexType.OCTET_NUM;
     }
 }

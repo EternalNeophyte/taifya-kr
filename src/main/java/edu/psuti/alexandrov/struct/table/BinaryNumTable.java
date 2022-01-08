@@ -9,7 +9,7 @@ public class BinaryNumTable extends LexemTable {
     }
 
     @Override
-    public String mask() {
-        return LexType.BINARY_NUM.mask();
+    public LexType lexType() {
+        return LexType.BINARY_NUM;
     }
 }
