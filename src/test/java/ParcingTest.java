@@ -1,6 +1,7 @@
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.lex.LexAnalyzer;
 import edu.psuti.alexandrov.struct.table.ExternalFileTable;
+import edu.psuti.alexandrov.struct.table.KeywordsTable;
 import edu.psuti.alexandrov.util.IOUtil;
 import edu.psuti.alexandrov.exp.pattern.WalkPattern;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class ParcingTest {
     @Test
     public void testLexemTable() {
         var s = IOUtil.readTxt("tables", "keywords");
-        ExternalFileTable table = new ExternalFileTable("tables\\keywords");
+        ExternalFileTable table = new KeywordsTable("tables\\keywords");
         table.toString();
     }
 
@@ -60,8 +61,8 @@ public class ParcingTest {
 
     @Test
     public void testRealLine() {
-        String line = "counte8r: int; counter == 0;".replaceAll("\\s", "");
-        Pattern.compile("\\w+|[\\W]{1,2}").matcher(line).results().map(MatchResult::group).forEach(System.out::println);
+        String line = "counte8r in\ncounter 0\n";
+        Pattern.compile("\\w+\\s+\\w+\n").matcher(line).results().map(MatchResult::group).forEach(System.out::println);
     }
 
     @Test

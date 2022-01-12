@@ -2,14 +2,14 @@ package edu.psuti.alexandrov.struct.table;
 
 import edu.psuti.alexandrov.lex.LexType;
 
-public class FloatNumTable extends LexemTable {
+public class AddOpTable extends LexemTable {
 
-    public FloatNumTable(String source) {
+    public AddOpTable(String source) {
         super(source);
     }
 
     @Override
     public LexType lexType() {
-        return LexType.FLOAT_NUM;
+        return LexType.ADD_OP;
     }
 }

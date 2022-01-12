@@ -9,7 +9,7 @@ public class HexNumTable extends LexemTable {
     }
 
     @Override
-    public String mask() {
-        return LexType.HEX_NUM.mask();
+    public LexType lexType() {
+        return LexType.HEX_NUM;
     }
 }

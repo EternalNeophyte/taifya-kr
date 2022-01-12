@@ -6,9 +6,9 @@ public class Matching implements Comparable<Matching> {
     private final MatchingType type;
 
     public Matching(Prediction prediction, int bound) {
-        this.index = prediction.index() - 1;
+        this.index = prediction.index();
         this.type = prediction.condition()
-                ? index == bound - 1
+                ? index == bound
                         ? MatchingType.COMPLETE
                         : MatchingType.PARTIAL
                 : MatchingType.NO;

@@ -3,7 +3,7 @@ package edu.psuti.alexandrov.struct.table;
 import edu.psuti.alexandrov.lex.Lexem;
 import edu.psuti.alexandrov.util.IOUtil;
 
-public class ExternalFileTable extends LexemTable {
+public abstract class ExternalFileTable extends LexemTable {
 
     public ExternalFileTable(String source) {
         super(source);
@@ -11,7 +11,7 @@ public class ExternalFileTable extends LexemTable {
 
     @Override
     public String mask() {
-        return SPLIT_SIGN + LINE_WRAP;
+        return WORD_CHARS + SPACES + ".+" + LINE_WRAP;
     }
 
     @Override

@@ -6,8 +6,6 @@ import edu.psuti.alexandrov.lex.Lexem;
 import edu.psuti.alexandrov.struct.SelfParcing;
 import edu.psuti.alexandrov.util.IntSequence;
 
-import java.util.Optional;
-
 public abstract class LexemTable extends SelfParcing<Lexem> {
 
     final String source;
@@ -19,7 +17,8 @@ public abstract class LexemTable extends SelfParcing<Lexem> {
 
     @Override
     public String mask() {
-        return lexType().mask();
+        LexType type = lexType();
+        return type.mask();
     }
 
     @Override
@@ -42,12 +41,12 @@ public abstract class LexemTable extends SelfParcing<Lexem> {
         return LexType.UNKNOWN;
     }
 
-    public Optional<LexUnit> find(String value) {
+    public LexUnit find(String value) {
         for(Lexem lexem : content) {
             if(lexem.value().equals(value)) {
-                return Optional.of(new LexUnit(lexType(), lexem));
+                return new LexUnit(lexType(), lexem);
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

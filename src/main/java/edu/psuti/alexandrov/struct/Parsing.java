@@ -10,10 +10,10 @@ public interface Parsing<T> {
     String OR = "|";
     String SCREEN = "\\";
     String SPACES = "\\s+";
-    String LINE_WRAP = "\n|\r\n";
+    String WORD_CHARS = "\\w+";
+    String LINE_WRAP = "\r\n";
     String OPEN_COMMENT = "{";
     String CLOSE_COMMENT = "}";
-    String SPLIT_SIGN = "s:";
     String LEX_DELIMITER = "%";
 
     String mask();

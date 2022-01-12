@@ -5,7 +5,9 @@ import edu.psuti.alexandrov.struct.table.*;
 import edu.psuti.alexandrov.util.IOUtil;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,30 +15,34 @@ import static edu.psuti.alexandrov.lex.LexType.*;
 
 public class LexAnalyzer extends SelfParcing<String> {
 
-    private final ExternalFileTable keywords;
-    private final ExternalFileTable delimiters;
-    private final IdentifiersTable identifiers;
-    private final BinaryNumTable binaries;
-    private final OctetNumTable octets;
-    private final HexNumTable hexs;
-    private final DecimalNumTable decimals;
-    private final FloatNumTable floats;
+    private final Map<LexType, LexemTable> tableMap;
 
     public LexAnalyzer() {
-        keywords = new ExternalFileTable("tables\\keywords");
-        delimiters = new ExternalFileTable("tables\\delimiters");
-        identifiers = new IdentifiersTable(input());
-        binaries = new BinaryNumTable(input());
-        octets = new OctetNumTable(input());
-        hexs = new HexNumTable(input());
-        decimals = new DecimalNumTable(input());
-        floats = new FloatNumTable(input());
+        String input = input();
+        tableMap = Stream.of(
+                    new KeywordsTable("tables\\keywords"),
+                    new TypeDefTable(input),
+                    new DelimitersTable("tables\\delimiters"),
+                    new CompareOpTable(input),
+                    new AddOpTable(input),
+                    new MultiplyOpTable(input),
+                    new IdentifiersTable(input),
+                    new BinaryNumTable(input),
+                    new OctetNumTable(input),
+                    new HexNumTable(input),
+                    new DecimalNumTable(input),
+                    new FloatNumTable(input)
+                )
+                .collect(Collectors.toUnmodifiableMap(
+                    LexemTable::lexType,
+                    Function.identity())
+                );
     }
 
     @Override
     public String mask() {
-        try(Stream<Lexem> lexems = delimiters.content()) {
-            return "\\w+" + OR + lexems
+        try(Stream<Lexem> lexems = tableMap.get(DELIMITER).content()) {
+            return WORD_CHARS + OR + lexems
                     .map(lex -> {
                         String value = lex.value();
                         return value.length() == 1 ? SCREEN + value : value;
@@ -48,7 +54,7 @@ public class LexAnalyzer extends SelfParcing<String> {
     @Override
     public String input() {
         return IOUtil.readTxt("samples\\program1")
-                     .replaceAll("\\s", LEX_DELIMITER);
+                     .replaceAll(SPACES, LEX_DELIMITER);
     }
 
     @Override
@@ -58,17 +64,7 @@ public class LexAnalyzer extends SelfParcing<String> {
 
     public Stream<LexUnit> lexUnits() {
         prepareContent();
-        return content()      //ToDo WIP
-                .map(lex -> null/*keywords.find(KEYWORD, lex)
-                    .or(() -> delimiters.find(DELIMITER, lex))
-                    .or(() -> identifiers.find(IDENTIFIER, lex))
-                    .or(() -> binaries.find(BINARY_NUM, lex))
-                    .or(() -> octets.find(OCTET_NUM, lex))
-                    .or(() -> hexs.find(HEX_NUM, lex))
-                    .or(() -> decimals.find(DECIMAL_NUM, lex))
-                    .or(() -> floats.find(FLOAT_NUM, lex))
-                    .orElse(LexUnit.unknown(lex)*/
-                );
+        return content().map(this::findInTables);
     }
 
     private void prepareContent() {
@@ -89,6 +85,16 @@ public class LexAnalyzer extends SelfParcing<String> {
                 }
             }
         }
+    }
+
+    private LexUnit findInTables(String lex) {
+        for(LexemTable table : tableMap.values()) {
+            LexUnit lexUnit = table.find(lex);
+            if(Objects.nonNull(lexUnit)) {
+                return lexUnit;
+            }
+        }
+        return LexUnit.unknown(lex);
     }
 
 }

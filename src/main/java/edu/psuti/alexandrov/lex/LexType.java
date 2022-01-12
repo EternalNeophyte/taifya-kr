@@ -7,7 +7,11 @@ public enum LexType {
 
     UNKNOWN(0, Parsing.EMPTY),
     KEYWORD(1, "\\w+"),
-    DELIMITER(2, "\\w+|[\\W&&[^" + Parsing.LEX_DELIMITER + "]]{0,2}"),
+    TYPE_DEF(1, "integer|real|boolean"),
+    DELIMITER(2, "[\\W&&[^" + Parsing.LEX_DELIMITER + "]]{0,2}"),
+    COMPARE_OP(2, "==|!=|>=|<=|>|<"),
+    ADD_OP(2, "or|plus|minus|"),
+    MULTIPLY_OP(2, "and|\\*|\\\\|"),
     IDENTIFIER(3, "[a-zA-Z][\\w]*"),
     BINARY_NUM(4, "[01]+[Bb]"),
     OCTET_NUM(4, "[0-7]+[Oo]"),

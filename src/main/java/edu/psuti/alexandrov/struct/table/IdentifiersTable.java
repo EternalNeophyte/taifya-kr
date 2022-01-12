@@ -9,7 +9,7 @@ public class IdentifiersTable extends LexemTable {
     }
 
     @Override
-    public String mask() {
-        return LexType.IDENTIFIER.mask();
+    public LexType lexType() {
+        return LexType.IDENTIFIER;
     }
 }
