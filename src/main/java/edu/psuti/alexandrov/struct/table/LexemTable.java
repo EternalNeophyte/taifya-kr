@@ -12,7 +12,7 @@ public abstract class LexemTable extends SelfParcing<Lexem> {
 
     LexemTable(String source) {
         this.source = source;
-        parseSelf();
+        parse();
     }
 
     @Override
@@ -32,8 +32,8 @@ public abstract class LexemTable extends SelfParcing<Lexem> {
     }
 
     @Override
-    protected void parseSelf() {
-        super.parseSelf();
+    protected void parse() {
+        super.parse();
         IntSequence.reset();
     }
 

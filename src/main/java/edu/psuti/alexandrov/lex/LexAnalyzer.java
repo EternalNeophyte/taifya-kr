@@ -69,7 +69,7 @@ public class LexAnalyzer extends SelfParcing<String> {
 
     private void prepareContent() {
         if(Objects.isNull(content)) {
-            parseSelf();
+            parse();
             Iterator<String> it = content.iterator();
             boolean commentDetected = false;
             while(it.hasNext()) {

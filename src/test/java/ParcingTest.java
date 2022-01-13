@@ -62,7 +62,11 @@ public class ParcingTest {
     @Test
     public void testRealLine() {
         String line = "counte8r in\ncounter 0\n";
-        Pattern.compile("\\w+\\s+\\w+\n").matcher(line).results().map(MatchResult::group).forEach(System.out::println);
+        Pattern.compile("oun")
+                .matcher(line)
+                .results()
+                .map(MatchResult::group)
+                .forEach(System.out::println);
     }
 
     @Test
