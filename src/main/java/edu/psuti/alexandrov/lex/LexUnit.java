@@ -1,8 +1,11 @@
 package edu.psuti.alexandrov.lex;
 
-public record LexUnit(LexType type, Lexem lexem) {
+import java.util.regex.MatchResult;
 
-    public static LexUnit unknown(String value) {
-        return new LexUnit(LexType.UNKNOWN, new Lexem(value));
+public record LexUnit(LexType type, MatchResult result) implements Comparable<LexUnit> {
+
+    @Override
+    public int compareTo(LexUnit other) {
+        return Integer.compare(this.result.start(), other.result.start());
     }
 }

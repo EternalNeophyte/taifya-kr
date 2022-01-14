@@ -1,9 +1,6 @@
 import edu.psuti.alexandrov.exp.Expression;
-import edu.psuti.alexandrov.lex.LexAnalyzer;
-import edu.psuti.alexandrov.struct.table.ExternalFileTable;
-import edu.psuti.alexandrov.struct.table.KeywordsTable;
-import edu.psuti.alexandrov.util.IOUtil;
 import edu.psuti.alexandrov.exp.pattern.WalkPattern;
+import edu.psuti.alexandrov.lex.LexAnalyzer;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -11,9 +8,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ParcingTest {
 
@@ -30,12 +25,6 @@ public class ParcingTest {
 
     }
 
-    @Test
-    public void testLexemTable() {
-        var s = IOUtil.readTxt("tables", "keywords");
-        ExternalFileTable table = new KeywordsTable("tables\\keywords");
-        table.toString();
-    }
 
     @Test
     public void testFloatAlternation() {
@@ -54,9 +43,8 @@ public class ParcingTest {
 
     @Test
     public void testAnalyzer() {
-        LexAnalyzer analyzer = new LexAnalyzer();
-        var s = analyzer.lexUnits();
-        s.forEach(System.out::println);
+        LexAnalyzer.units().forEach(u -> System.out.println(u.type() + ": " + u.result().group() + " [" +
+                u.result().start() + ", " + u.result().end() + "]"));
     }
 
     @Test

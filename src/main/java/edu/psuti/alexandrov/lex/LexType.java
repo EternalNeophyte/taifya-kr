@@ -1,38 +1,53 @@
 package edu.psuti.alexandrov.lex;
 
 import edu.psuti.alexandrov.exp.Expression;
-import edu.psuti.alexandrov.struct.Parsing;
+
+import java.util.Arrays;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static java.util.regex.Pattern.compile;
 
 public enum LexType {
 
-    UNKNOWN(0, Parsing.EMPTY),
-    KEYWORD(1, "\\w+"),
-    TYPE_DEF(1, "integer|real|boolean"),
-    DELIMITER(2, "[\\W&&[^" + Parsing.LEX_DELIMITER + "]]{0,2}"),
-    COMPARE_OP(2, "==|!=|>=|<=|>|<"),
-    ADD_OP(2, "or|plus|minus|"),
-    MULTIPLY_OP(2, "and|\\*|\\\\|"),
-    IDENTIFIER(3, "[a-zA-Z][\\w]*"),
-    BINARY_NUM(4, "[01]+[Bb]"),
-    OCTET_NUM(4, "[0-7]+[Oo]"),
-    HEX_NUM(4,"[\\da-fA-F]+[Hh]"),
-    DECIMAL_NUM(4, "[\\d]+[Dd]?"),
-    FLOAT_NUM(4, "[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]");
-
-    LexType(int tableNum, String mask) {
-        this.tableNum = tableNum;
-        this.mask = mask;
-    }
+    COMMENT_BLOCK(0, compile("[{][\\s\\S]*[}]")),
+    KEYWORD(1, compile("\\w+|for")),
+    TYPE_DEF(1, compile("integer|real|boolean")),
+    DELIMITER(2, compile("[;:.,]")),
+    COMPARE_OP(2, compile("==|!=|>=|<=|>|<")),
+    ADD_OP(2, compile("or|plus|minus")),
+    MULTIPLY_OP(2, compile("and|\\*|\\\\")),
+    IDENTIFIER(3, compile("[a-zA-Z][\\w]*")),
+    BINARY_NUM(4, compile("[01]+[Bb]")),
+    OCTET_NUM(4, compile("[0-7]+[Oo]")),
+    HEX_NUM(4,compile("[\\da-fA-F]+[Hh]")),
+    DECIMAL_NUM(4, compile("[\\d]+[Dd]?")),
+    FLOAT_NUM(4, compile("[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]"));
 
     private final int tableNum;
-    private final String mask;
+    private final Pattern pattern;
+
+    LexType(int tableNum, Pattern pattern) {
+        this.tableNum = tableNum;
+        this.pattern = pattern;
+    }
 
     public int tableNum() {
         return tableNum;
     }
 
-    public String mask() {
-        return mask;
+    public Pattern pattern() {
+        return pattern;
+    }
+
+    public Stream<MatchResult> match(String content) {
+        return pattern.matcher(content)
+                .results();
+    }
+
+    public static Stream<LexType> all() {
+        return Arrays.stream(values());
     }
 
     public static Expression<LexType> expression() {
