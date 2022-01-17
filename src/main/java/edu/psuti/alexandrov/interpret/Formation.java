@@ -2,6 +2,7 @@ package edu.psuti.alexandrov.interpret;
 
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.lex.LexType;
+import edu.psuti.alexandrov.lex.LexUnit;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +40,13 @@ public enum Formation {
 
     public static Stream<Formation> all() {
         return ALL;
+    }
+
+    //ToDo ???
+    public void submit(List<LexUnit> units, RuntimeContext context) {
+        if(expression.compute().isComplete()) {
+            //...
+        }
     }
 
     public static List<Formation> allAsList() {
