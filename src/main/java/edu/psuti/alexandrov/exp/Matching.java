@@ -22,6 +22,18 @@ public class Matching implements Comparable<Matching> {
         return type;
     }
 
+    public boolean isComplete() {
+        return type.equals(MatchingType.COMPLETE);
+    }
+
+    public boolean isPartial() {
+        return type.equals(MatchingType.PARTIAL);
+    }
+
+    public boolean isNone() {
+        return type.equals(MatchingType.NO);
+    }
+
     @Override
     public int compareTo(Matching other) {
         return Integer.compare(this.type.priority(), other.type.priority());

@@ -18,13 +18,14 @@ public enum LexType {
     COMPARE_OP(2, compile("==|!=|>=|<=|>|<")),
     ADD_OP(2, compile("or|plus|minus")),
     MULTIPLY_OP(2, compile("and|\\*|\\\\")),
-    IDENTIFIER(3, compile("[a-zA-Z][\\w]*")),
     BINARY_NUM(4, compile("[01]+[Bb]")),
     OCTET_NUM(4, compile("[0-7]+[Oo]")),
     HEX_NUM(4,compile("[\\da-fA-F]+[Hh]")),
     DECIMAL_NUM(4, compile("[\\d]+[Dd]?")),
-    FLOAT_NUM(4, compile("[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]"));
+    FLOAT_NUM(4, compile("[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]")),
+    IDENTIFIER(3, compile("[a-zA-Z][\\w]*"));
 
+    private static final Stream<LexType> ALL = Arrays.stream(values());
     private final int tableNum;
     private final Pattern pattern;
 
@@ -47,7 +48,7 @@ public enum LexType {
     }
 
     public static Stream<LexType> all() {
-        return Arrays.stream(values());
+        return ALL;
     }
 
     public static Expression<LexType> expression() {
