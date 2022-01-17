@@ -4,6 +4,7 @@ import edu.psuti.alexandrov.exp.Matching;
 import edu.psuti.alexandrov.lex.LexType;
 import edu.psuti.alexandrov.lex.LexUnit;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,9 +23,10 @@ public class SemanticAnalyzer {
         units.peek(u -> {
             buffer.add(u.type());
              Formation.all()
-                    .forEach(f -> f.expression()
+                    .forEach(f -> /*f.expression
                             .compute(buffer)
-                            .ifComplete(m -> { }));
+                            .ifComplete(m ->*/ { });
         });
+        //Map to key - Formation and value - copy of buffer
     }
 }
