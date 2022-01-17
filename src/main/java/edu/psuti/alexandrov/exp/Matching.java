@@ -1,5 +1,7 @@
 package edu.psuti.alexandrov.exp;
 
+import java.util.function.Consumer;
+
 public class Matching implements Comparable<Matching> {
 
     private final int index;
@@ -32,6 +34,25 @@ public class Matching implements Comparable<Matching> {
 
     public boolean isNone() {
         return type.equals(MatchingType.NO);
+    }
+
+    private Matching ifTypeEquals(MatchingType other, Consumer<Matching> consumer) {
+        if(type.equals(other)) {
+            consumer.accept(this);
+        }
+        return this;
+    }
+
+    public Matching ifComplete(Consumer<Matching> consumer) {
+        return ifTypeEquals(MatchingType.COMPLETE, consumer);
+    }
+
+    public Matching ifPartial(Consumer<Matching> consumer) {
+        return ifTypeEquals(MatchingType.PARTIAL, consumer);
+    }
+
+    public Matching ifNo(Consumer<Matching> consumer) {
+        return ifTypeEquals(MatchingType.NO, consumer);
     }
 
     @Override

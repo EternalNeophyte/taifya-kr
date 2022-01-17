@@ -22,10 +22,9 @@ public class SemanticAnalyzer {
         units.peek(u -> {
             buffer.add(u.type());
              Formation.all()
-                    .filter(f -> f.expression()
-                                .compute(buffer)
-                                .isComplete())
-                    .forEach(f -> { });
+                    .forEach(f -> f.expression()
+                            .compute(buffer)
+                            .ifComplete(m -> { }));
         });
     }
 }
