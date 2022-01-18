@@ -11,7 +11,7 @@ import java.util.Map;
 public class RuntimeContext {
 
     private Map<String, ValueContainer<?>> variables;
-    private List<Formation> formations;
+    private List<FormationType> formations;
 
     //lookup next formation
     //nextTask()
