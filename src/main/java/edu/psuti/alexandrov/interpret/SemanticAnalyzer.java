@@ -1,6 +1,7 @@
 package edu.psuti.alexandrov.interpret;
 
 import edu.psuti.alexandrov.exp.Matching;
+import edu.psuti.alexandrov.lex.LexAnalyzer;
 import edu.psuti.alexandrov.lex.LexType;
 import edu.psuti.alexandrov.lex.LexUnit;
 
@@ -17,15 +18,22 @@ import java.util.stream.Stream;
  */
 public class SemanticAnalyzer {
 
+    RuntimeContext context;
 
-    public void parse(Stream<LexUnit> units) {
+    public void parse() {
         final List<LexType> buffer = new LinkedList<>();
-        units.peek(u -> {
+        LexAnalyzer.units()  //Maybe reduce
+                .peek(u -> {
             buffer.add(u.type());
-             Formation.all()
-                    .forEach(f -> /*f.expression
-                            .compute(buffer)
-                            .ifComplete(m ->*/ { });
+            Formation.all()
+                    .forEach(f -> f.getExpression()
+                                .compute(buffer)
+                                .ifComplete(m -> {
+                                    //??? List.copyOf(buffer);
+
+                                    buffer.clear();
+                                })
+                    );
         });
         //Map to key - Formation and value - copy of buffer
     }

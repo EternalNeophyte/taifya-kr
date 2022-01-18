@@ -117,11 +117,8 @@ public enum Formation {
         return ALL;
     }
 
-    //ToDo ???
-    public void submit(List<LexUnit> units, RuntimeContext context) {
-        if(expression.compute().isComplete()) {
-            //...
-        }
+    public Expression<LexType> getExpression() {
+        return expression;
     }
 
     public static List<Formation> allAsList() {

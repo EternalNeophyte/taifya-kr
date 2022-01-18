@@ -1,6 +1,7 @@
 package edu.psuti.alexandrov.interpret;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 17.01.2022 by
@@ -9,7 +10,10 @@ import java.util.List;
  */
 public class RuntimeContext {
 
-    private List<Variable<?>> variables;
+    private Map<String, ValueContainer<?>> variables;
+    private List<Formation> formations;
 
+    //lookup next formation
+    //nextTask()
 
 }
