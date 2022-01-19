@@ -25,15 +25,14 @@ public record Formation(FormationType type, List<LexUnit> units) {
     }
 
     public List<LexUnit> getUnitsByType(LexType type) {
-        UnitsTypeTree queried = UnitsTypeTree.POOL.get(this);
-        return Optional.ofNullable(queried)
+        UnitsTypeTree tree = Optional
+                .ofNullable(UnitsTypeTree.POOL.get(this))
                 .orElseGet(() -> {
-                    UnitsTypeTree tree = new UnitsTypeTree();
-                    UnitsTypeTree.POOL.put(this, tree);
-                    return tree;
-                })
-                .body
-                .get(type);
+                    UnitsTypeTree newTree = new UnitsTypeTree();
+                    UnitsTypeTree.POOL.put(this, newTree);
+                    return newTree;
+                });
+        return tree.body.get(type);
     }
 
 

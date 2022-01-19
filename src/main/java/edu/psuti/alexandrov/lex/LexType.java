@@ -12,7 +12,6 @@ import static java.util.regex.Pattern.compile;
 public enum LexType {
 
     COMMENT_BLOCK(0, compile("[{][\\s\\S]*[}]")),
-    KEYWORD(1, compile("\\w+")),
     LOGIC_CONST(1, compile("true|false")),
     TYPE_DEF(1, compile("integer|real|boolean")),
     ASSIGN_DEF(1, compile("let")),
@@ -41,8 +40,9 @@ public enum LexType {
     DECIMAL_NUM(4, compile("[\\d]+[Dd]?")),
     FLOAT_NUM(4, compile("[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]")),
     IDENTIFIER(3, compile("[a-zA-Z][\\w]*")),
+    KEYWORD(1, compile("\\w+")),
 
-    RAW_STATEMENT(0, compile("[\\s\\S]*"));
+    RAW_STATEMENT(0, compile("[\\s\\S&&[^%]]+"));
 
     public static final LexType[] OPERAND = new LexType[] {
             IDENTIFIER, FLOAT_NUM, BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM

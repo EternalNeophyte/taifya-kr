@@ -8,10 +8,9 @@ import java.util.Map;
  *
  * @author alexandrov
  */
-public class RuntimeContext {
-
-    private Map<String, ValueContainer<?>> variables;
-    private List<FormationType> formations;
+public record RuntimeContext(
+        Map<String, ValueContainer<?>> variables,
+        List<Formation> formations) {
 
     //lookup next formation
     //nextTask()

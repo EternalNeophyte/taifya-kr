@@ -1,6 +1,6 @@
 package edu.psuti.alexandrov.exp;
 
-import edu.psuti.alexandrov.exp.pattern.*;
+import edu.psuti.alexandrov.exp.pattern.WalkPattern;
 
 import java.util.Arrays;
 import java.util.LinkedList;

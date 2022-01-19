@@ -43,8 +43,7 @@ public class ParcingTest {
 
     @Test
     public void testAnalyzer() {
-        LexAnalyzer.units().forEach(u -> System.out.println(u.type() + ": " + u.result().group() + " [" +
-                u.result().start() + ", " + u.result().end() + "]"));
+
     }
 
     @Test
@@ -89,6 +88,12 @@ public class ParcingTest {
                 .one(9)
                 .compute(8, 7, 3, 3, 5, 3, 9);
         m.toString();
+    }
+
+    @Test
+    public void testSemanticAnalysis() {
+        var c = LexAnalyzer.formations();
+        c.toString();
     }
 
 }
