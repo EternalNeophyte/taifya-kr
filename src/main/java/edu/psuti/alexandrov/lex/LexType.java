@@ -40,21 +40,22 @@ public enum LexType {
     DECIMAL_NUM(4, compile("[\\d]+[Dd]?")),
     FLOAT_NUM(4, compile("[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]")),
     IDENTIFIER(3, compile("[a-zA-Z][\\w]*")),
-    KEYWORD(1, compile("\\w+")),
-
     RAW_STATEMENT(0, compile("[\\s\\S&&[^%]]+"));
+
 
     public static final LexType[] OPERAND = new LexType[] {
             IDENTIFIER, FLOAT_NUM, BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM
     };
-    private static final Stream<LexType> ALL = Arrays.stream(values());
+
     private final int tableNum;
     private final Pattern pattern;
+
 
     LexType(int tableNum, Pattern pattern) {
         this.tableNum = tableNum;
         this.pattern = pattern;
     }
+
 
     public int tableNum() {
         return tableNum;
@@ -64,13 +65,14 @@ public enum LexType {
         return pattern;
     }
 
+
     public Stream<MatchResult> match(String content) {
         return pattern.matcher(content)
                 .results();
     }
 
     public static Stream<LexType> all() {
-        return ALL;
+        return Arrays.stream(values());
     }
 
     public static Expression<LexType> expression() {
