@@ -15,7 +15,7 @@ public record Formation(FormationType type, List<LexUnit> units) {
 
     public class UnitsTypeTree {
 
-        private static final Map<Formation, UnitsTypeTree> POOL = new LinkedHashMap<>();
+        private static final Map<Formation, UnitsTypeTree> POOL = new HashMap<>();
         private final Map<LexType, List<LexUnit>> body = units
                 .stream()
                 .collect(Collectors.groupingBy(LexUnit::type));
