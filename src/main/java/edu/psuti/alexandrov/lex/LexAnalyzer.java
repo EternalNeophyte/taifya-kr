@@ -1,7 +1,9 @@
 package edu.psuti.alexandrov.lex;
 
+import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.interpret.Formation;
 import edu.psuti.alexandrov.interpret.FormationType;
+import edu.psuti.alexandrov.util.BiBuffer;
 import edu.psuti.alexandrov.util.IOUtil;
 
 import java.util.LinkedList;
@@ -15,7 +17,8 @@ public class LexAnalyzer {
         final String content = IOUtil.readTxt("samples\\program1")
                 .replaceAll("\\s+", LEX_DELIMITER);
         final StringBuilder sb = new StringBuilder(content);
-        final LexBuffer buffer = LexBuffer.allocate();
+        final BiBuffer<LexUnit, LexType> lexBuffer = BiBuffer.BasedOnLinkedList.allocate();
+        final BiBuffer<LexUnit, String> errBuffer = BiBuffer.BasedOnLinkedList.allocate();
         return LexType
                 .all()
                 .flatMap(type -> type
@@ -30,14 +33,17 @@ public class LexAnalyzer {
                 .sorted()
                 .collect(LinkedList::new,
                         (list, unit) -> {
-                            buffer.put(unit);
-                            //ToDo очищать буффер на каждой итерации, если во всех случаях Matching = NO
-                            FormationType.findCompleteMatching(buffer.types())
-                                    .ifPresent(type -> {
-                                        List<LexUnit> accumulated = buffer.copyUnits();
-                                        list.add(new Formation(type, accumulated));
-                                        buffer.clear();
-                                    });
+                            lexBuffer.put(unit, unit.type());
+                            MatchingItem<FormationType> first = FormationType.findFirst(lexBuffer.secondHalf());
+                            switch (first.matching().type()) {
+                                case COMPLETE -> {
+                                    list.add(new Formation(first.item(), lexBuffer.copyFirstHalf()));
+                                    lexBuffer.clear();
+                                }
+                                case NO -> {
+                                    errBuffer.put(unit, unit.type() + " not allowed here");
+                                }
+                            }
                         },
                         LinkedList::addAll);
     }

@@ -11,7 +11,7 @@ import static java.util.regex.Pattern.compile;
 
 public enum LexType {
 
-    COMMENT_BLOCK(0, compile("[{][\\s\\S]*[}]")),
+    COMMENT_BODY(0, compile("[{][\\s\\S]*[}]")),
     LOGIC_CONST(1, compile("true|false")),
     TYPE_DEF(1, compile("integer|real|boolean")),
     ASSIGN_DEF(1, compile("let")),

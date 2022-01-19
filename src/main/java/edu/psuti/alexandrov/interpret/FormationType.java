@@ -2,6 +2,7 @@ package edu.psuti.alexandrov.interpret;
 
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.exp.Matching;
+import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.lex.LexType;
 
 import java.util.Arrays;
@@ -12,6 +13,8 @@ import java.util.stream.Stream;
 import static edu.psuti.alexandrov.lex.LexType.*;
 
 public enum FormationType {
+
+    COMMENT_BLOCK(expression().many(COMMENT_BODY)),
 
     VAR_DEF(expression()
             .one(IDENTIFIER)
@@ -104,7 +107,6 @@ public enum FormationType {
             .one(END_ARGS))
     ;
 
-
     private final Expression<LexType> expression;
 
 
@@ -114,14 +116,23 @@ public enum FormationType {
 
 
     public static Optional<FormationType> findCompleteMatching(List<LexType> lexTypes) {
-        for(FormationType type : values()) {
-            Matching matching = type.expression.compute(lexTypes);
+        for(FormationType formType : values()) {
+            Matching matching = formType.expression.compute(lexTypes);
             if(matching.isComplete()) {
-                return Optional.of(type);
+                return Optional.of(formType);
             }
         }
         return Optional.empty();
     }
+
+    public static MatchingItem<FormationType> findFirst(List<LexType> lexTypes) {
+        return Arrays.stream(values())
+                .map(type -> new MatchingItem<>(type.expression.compute(lexTypes), type))
+                .sorted()
+                .findFirst()
+                .orElseThrow();
+    }
+
 
     public static Stream<FormationType> all() {
         return Arrays.stream(values());

@@ -89,11 +89,11 @@ public class Expression<T> {
                     },
                     Prediction::merge
             );
-            return new Matching(result.decrement(), values.size() - 1);
+            return new Matching(result, values.size());
         }
         catch (SkipMergingException e) {
             Prediction transported = e.transported();
-            return new Matching(transported.decrement(), values.size() - 1);
+            return new Matching(transported, values.size());
         }
     }
 }

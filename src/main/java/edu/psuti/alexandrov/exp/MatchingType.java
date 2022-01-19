@@ -2,9 +2,9 @@ package edu.psuti.alexandrov.exp;
 
 public enum MatchingType {
 
-    COMPLETE(2),
+    COMPLETE(0),
     PARTIAL(1),
-    NO(0);
+    NO(2);
 
     private final int priority;
 
