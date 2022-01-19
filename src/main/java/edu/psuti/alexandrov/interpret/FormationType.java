@@ -101,13 +101,12 @@ public enum FormationType {
             .one(OUTPUT_DEF)
             .one(START_ARGS)
             .one(RAW_STATEMENT)
-            .one(END_ARGS)),
+            .one(END_ARGS))
     ;
 
-    private static final Stream<FormationType> ALL = Arrays.stream(values());
-    private static final List<FormationType> ALL_LIST = Arrays.asList(values());
+
     private final Expression<LexType> expression;
-    //private final BiConsumer<List<LexUnit>, RuntimeContext> handler
+
 
     FormationType(Expression<LexType> expression) {
         this.expression = expression;
@@ -125,15 +124,7 @@ public enum FormationType {
     }
 
     public static Stream<FormationType> all() {
-        return ALL;
-    }
-
-    public Expression<LexType> getExpression() {
-        return expression;
-    }
-
-    public static List<FormationType> allAsList() {
-        return ALL_LIST;
+        return Arrays.stream(values());
     }
 
 }
