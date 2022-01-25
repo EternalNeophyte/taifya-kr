@@ -3,6 +3,7 @@ package edu.psuti.alexandrov.lex;
 import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.interpret.Formation;
 import edu.psuti.alexandrov.interpret.FormationType;
+import edu.psuti.alexandrov.interpret.RuntimeContext;
 import edu.psuti.alexandrov.util.BiBuffer;
 import edu.psuti.alexandrov.util.IOUtil;
 
@@ -40,9 +41,7 @@ public class LexAnalyzer {
                                     list.add(new Formation(first.item(), lexBuffer.copyFirstHalf()));
                                     lexBuffer.clear();
                                 }
-                                case NO -> {
-                                    errBuffer.put(unit, unit.type() + " not allowed here");
-                                }
+                                case NO -> errBuffer.put(unit, unit.type() + " not allowed here");
                             }
                         },
                         LinkedList::addAll);

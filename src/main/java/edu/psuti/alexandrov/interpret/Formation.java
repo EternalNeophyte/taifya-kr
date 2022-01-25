@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
  */
 public record Formation(FormationType type, List<LexUnit> units) {
 
+
+    //Maybe List<Formation> nested
+
     public class UnitsTypeTree {
 
         private static final Map<Formation, UnitsTypeTree> POOL = new HashMap<>();

@@ -1,20 +1,21 @@
 package edu.psuti.alexandrov.interpret;
 
 import edu.psuti.alexandrov.exp.Expression;
-import edu.psuti.alexandrov.exp.Matching;
 import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.lex.LexType;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static edu.psuti.alexandrov.lex.LexType.*;
+import static edu.psuti.alexandrov.util.ArraySamples.merge;
 
 public enum FormationType {
 
-    COMMENT_BLOCK(expression().many(COMMENT_BODY)),
+    COMMENT(expression().many(COMMENT_BODY)),
+
+    END(expression().one(END_PROGRAM)),
 
     VAR_DEF(expression()
             .one(IDENTIFIER)
@@ -71,26 +72,31 @@ public enum FormationType {
     //Needs further check
     IF_THEN_ELSE(expression()
             .one(IF_DEF)
-            .one(RAW_STATEMENT)
+            .maybeMany(ANYTHING)
             .one(THEN_SECTION)
-            .one(RAW_STATEMENT)
-            .maybeCarousel(ELSE_SECTION, RAW_STATEMENT)
+            .maybeMany(ANYTHING)
             .one(END_IF)),
 
     //Needs further check
     FOR_LOOP(expression()
             .one(FOR_LOOP_DEF)
             .one(START_ARGS)
-            .one(RAW_STATEMENT)
+            .maybeOne(IDENTIFIER)
+            .maybeOne(ASSIGN_OP)
+            .maybeMany(merge(LexType[]::new, OPERAND, ARITHMETIC_OP))
             .one(END_STATEMENT)
-            .one(RAW_STATEMENT)
+            .maybeOne(IDENTIFIER)
+            .maybeOne(COMPARE_OP)
+            .maybeMany(merge(LexType[]::new, OPERAND, ARITHMETIC_OP))
             .one(END_STATEMENT)
-            .one(END_ARGS)
-            .one(RAW_STATEMENT)),
+            .maybeOne(IDENTIFIER)
+            .maybeOne(ASSIGN_OP)
+            .maybeMany(merge(LexType[]::new, OPERAND, ARITHMETIC_OP))
+            .one(END_ARGS)),
 
     WHILE_LOOP(expression()
             .one(WHILE_LOOP_DEF)
-            .one(RAW_STATEMENT)
+            .maybeMany(ANYTHING)
             .one(END_WHILE_LOOP)),
 
     INPUT(expression()
@@ -103,7 +109,7 @@ public enum FormationType {
     OUTPUT(expression()
             .one(OUTPUT_DEF)
             .one(START_ARGS)
-            .one(RAW_STATEMENT)
+            .maybeMany(ANYTHING)
             .one(END_ARGS))
     ;
 
@@ -112,17 +118,6 @@ public enum FormationType {
 
     FormationType(Expression<LexType> expression) {
         this.expression = expression;
-    }
-
-
-    public static Optional<FormationType> findCompleteMatching(List<LexType> lexTypes) {
-        for(FormationType formType : values()) {
-            Matching matching = formType.expression.compute(lexTypes);
-            if(matching.isComplete()) {
-                return Optional.of(formType);
-            }
-        }
-        return Optional.empty();
     }
 
     public static MatchingItem<FormationType> findFirst(List<LexType> lexTypes) {

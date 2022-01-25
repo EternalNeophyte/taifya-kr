@@ -1,5 +1,8 @@
 package edu.psuti.alexandrov.interpret;
 
+import edu.psuti.alexandrov.lex.LexUnit;
+import edu.psuti.alexandrov.util.BiBuffer;
+
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +13,8 @@ import java.util.Map;
  */
 public record RuntimeContext(
         Map<String, ValueContainer<?>> variables,
-        List<Formation> formations) {
+        List<Formation> formations, BiBuffer<LexUnit,
+        String> errBuffer) {
 
     //lookup next formation
     //nextTask()

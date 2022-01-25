@@ -34,18 +34,24 @@ public enum LexType {
     START_ARGS(2, compile("[(]")),
     END_ARGS(2, compile("[)]")),
     END_STATEMENT(2, compile("[;]")),
+    END_PROGRAM(0, compile("end")),
     BINARY_NUM(4, compile("[01]+[Bb]")),
     OCTET_NUM(4, compile("[0-7]+[Oo]")),
     HEX_NUM(4,compile("[\\da-fA-F]+[Hh]")),
     DECIMAL_NUM(4, compile("[\\d]+[Dd]?")),
     FLOAT_NUM(4, compile("[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]")),
-    IDENTIFIER(3, compile("[a-zA-Z][\\w]*")),
-    RAW_STATEMENT(0, compile("[\\s\\S&&[^%]]+"));
+    IDENTIFIER(3, compile("[a-zA-Z][\\w]*"));
 
 
     public static final LexType[] OPERAND = new LexType[] {
             IDENTIFIER, FLOAT_NUM, BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM
     };
+
+    public static final LexType[] ARITHMETIC_OP = new LexType[] {
+            ADD_OP, MULTIPLY_OP
+    };
+
+    public static final LexType[] ANYTHING = values();
 
     private final int tableNum;
     private final Pattern pattern;
