@@ -16,9 +16,9 @@ public enum LexType {
     TYPE_DEF(1, compile("integer|real|boolean")),
     ASSIGN_DEF(1, compile("let")),
     IF_DEF(1, compile("if")),
+    END_IF(1, compile("end_else")),
     THEN_SECTION(1, compile("then")),
     ELSE_SECTION(1, compile("else")),
-    END_IF(1, compile("end_else")),
     FOR_LOOP_DEF(1, compile("for")),
     WHILE_LOOP_DEF(1, compile("do while")),
     END_WHILE_LOOP(1, compile("loop")),
@@ -42,16 +42,6 @@ public enum LexType {
     FLOAT_NUM(4, compile("[\\d]*[.][\\d]+([eE][+-]?[\\d])?|[\\d]+[eE][+-]?[\\d]")),
     IDENTIFIER(3, compile("[a-zA-Z][\\w]*"));
 
-
-    public static final LexType[] OPERAND = new LexType[] {
-            IDENTIFIER, FLOAT_NUM, BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM
-    };
-
-    public static final LexType[] ARITHMETIC_OP = new LexType[] {
-            ADD_OP, MULTIPLY_OP
-    };
-
-    public static final LexType[] ANYTHING = values();
 
     private final int tableNum;
     private final Pattern pattern;

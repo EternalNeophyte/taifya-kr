@@ -3,15 +3,17 @@ package edu.psuti.alexandrov.interpret;
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.lex.LexType;
+import edu.psuti.alexandrov.util.ArraySampler;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static edu.psuti.alexandrov.lex.LexType.*;
-import static edu.psuti.alexandrov.util.ArraySamples.merge;
 
-public enum FormationType {
+public enum FormationType implements SubFormations {
 
     COMMENT(expression().many(COMMENT_BODY)),
 
@@ -72,9 +74,9 @@ public enum FormationType {
     //Needs further check
     IF_THEN_ELSE(expression()
             .one(IF_DEF)
-            .maybeMany(ANYTHING)
+            .many(LEX_TYPE_SAMPLER.exclude(ANYTHING, IF_DEF, THEN_SECTION, END_IF))
             .one(THEN_SECTION)
-            .maybeMany(ANYTHING)
+            .many(LEX_TYPE_SAMPLER.exclude(ANYTHING, IF_DEF, THEN_SECTION, END_IF))
             .one(END_IF)),
 
     //Needs further check
@@ -83,15 +85,15 @@ public enum FormationType {
             .one(START_ARGS)
             .maybeOne(IDENTIFIER)
             .maybeOne(ASSIGN_OP)
-            .maybeMany(merge(LexType[]::new, OPERAND, ARITHMETIC_OP))
+            .maybeMany(LEX_TYPE_SAMPLER.merge(OPERAND, ARITHMETIC_OP))
             .one(END_STATEMENT)
             .maybeOne(IDENTIFIER)
             .maybeOne(COMPARE_OP)
-            .maybeMany(merge(LexType[]::new, OPERAND, ARITHMETIC_OP))
+            .maybeMany(LEX_TYPE_SAMPLER.merge(OPERAND, ARITHMETIC_OP))
             .one(END_STATEMENT)
             .maybeOne(IDENTIFIER)
             .maybeOne(ASSIGN_OP)
-            .maybeMany(merge(LexType[]::new, OPERAND, ARITHMETIC_OP))
+            .maybeMany(LEX_TYPE_SAMPLER.merge(OPERAND, ARITHMETIC_OP))
             .one(END_ARGS)),
 
     WHILE_LOOP(expression()
@@ -120,12 +122,13 @@ public enum FormationType {
         this.expression = expression;
     }
 
-    public static MatchingItem<FormationType> findFirst(List<LexType> lexTypes) {
-        return Arrays.stream(values())
+    public static void atLeastOne(List<LexType> lexTypes, Consumer<MatchingItem<FormationType>> terminalOp) {
+        AtomicInteger count = new AtomicInteger();
+        Arrays.stream(values())
                 .map(type -> new MatchingItem<>(type.expression.compute(lexTypes), type))
                 .sorted()
-                .findFirst()
-                .orElseThrow();
+                .takeWhile(item -> count.getAndIncrement() > 0 || item.matching().isComplete())
+                .forEach(terminalOp);
     }
 
 
@@ -133,4 +136,7 @@ public enum FormationType {
         return Arrays.stream(values());
     }
 
+    public Expression<LexType> getExpression() {
+        return expression;
+    }
 }

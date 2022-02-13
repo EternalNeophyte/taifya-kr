@@ -3,5 +3,5 @@
         Комментарий
     }
     for(counter = 0; counter < 10h; counter = counter plus 1B)
-        if counter == 5o then output(counter) end_if
+        if counter == 5o then output(counter) end_else
 end

@@ -1,6 +1,8 @@
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.exp.pattern.WalkPattern;
+import edu.psuti.alexandrov.interpret.FormationType;
 import edu.psuti.alexandrov.lex.LexAnalyzer;
+import edu.psuti.alexandrov.lex.LexType;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -94,6 +96,23 @@ public class ParcingTest {
     public void testSemanticAnalysis() {
         var c = LexAnalyzer.formations();
         c.toString();
+    }
+
+    @Test
+    public void testIf() {
+        var m = FormationType.IF_THEN_ELSE
+                .getExpression()
+                .compute(LexType.IF_DEF,
+                        LexType.IDENTIFIER,
+                        LexType.COMPARE_OP,
+                        //LexType.OCTET_NUM,
+                        LexType.THEN_SECTION,
+                        LexType.OUTPUT_DEF,
+                        LexType.START_ARGS,
+                        //LexType.IDENTIFIER,
+                        LexType.END_ARGS,
+                        LexType.END_IF);
+        m.toString();
     }
 
 }

@@ -12,18 +12,12 @@ import java.util.function.BiConsumer;
  */
 public record BiBuffer<T1, T2>(List<T1> firstHalf, List<T2> secondHalf) {
 
-    public static class BasedOnLinkedList {
-
-        public static <T1, T2> BiBuffer<T1, T2> allocate() {
-            return new BiBuffer<>(new LinkedList<>(), new LinkedList<>());
-        }
+    public static <T1, T2> BiBuffer<T1, T2> basedOnLinkedList() {
+        return new BiBuffer<>(new LinkedList<>(), new LinkedList<>());
     }
 
-    public static class BasedOnArrayList {
-
-        public static <T1, T2> BiBuffer<T1, T2> allocate() {
-            return new BiBuffer<>(new ArrayList<>(), new ArrayList<>());
-        }
+    public static <T1, T2> BiBuffer<T1, T2> basedOnArrayList() {
+        return new BiBuffer<>(new ArrayList<>(), new ArrayList<>());
     }
 
     public record Pair<T1, T2>(T1 firstItem, T2 secondItem) {
