@@ -27,7 +27,7 @@ public record RuntimeContext(
             catch (IllegalLexException e) {
                 errors.put(e.unit(), e.getMessage());
             }
-            catch (IllegalArgumentException e) {
+            catch (RuntimeException e) {
                 errors.put(LexUnit.STUB, e.getMessage());
             }
         }

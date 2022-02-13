@@ -1,6 +1,7 @@
 package edu.psuti.alexandrov.lex;
 
 import edu.psuti.alexandrov.interpret.Formation;
+import edu.psuti.alexandrov.interpret.FormationType;
 import edu.psuti.alexandrov.interpret.RuntimeContext;
 import edu.psuti.alexandrov.util.BiBuffer;
 import edu.psuti.alexandrov.util.IOUtil;
@@ -8,9 +9,7 @@ import edu.psuti.alexandrov.util.IOUtil;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.MatchResult;
-
-import static edu.psuti.alexandrov.interpret.FormationType.atLeastOne;
+import java.util.Optional;
 
 public class LexAnalyzer {
 
@@ -34,21 +33,29 @@ public class LexAnalyzer {
                 )
                 .sorted()
                 .collect(LinkedList::new,
-                        (list, unit) -> {
-                            lexBuffer.put(unit, unit.type());
-                            atLeastOne(lexBuffer.secondHalf(),
-                                    mi -> {
-                                        switch (mi.matching().type()) {
-                                            case COMPLETE -> {
-                                                list.add(new Formation(mi.item(), lexBuffer.copyFirstHalf()));
-                                                lexBuffer.clear();
-                                                errBuffer.clear();
-                                            }
-                                            case NO -> errBuffer.put(unit, "Неожиданный " +  unit.type());
-                                        }
-                                    });
-                        },
+                        (list, unit) -> findFormation(unit, lexBuffer, errBuffer).ifPresent(list::add),
                         LinkedList::addAll);
         return new RuntimeContext(new HashMap<>(), formations, errBuffer);
+    }
+
+    public static Optional<Formation> findFormation(LexUnit unit,
+                                          BiBuffer<LexUnit, LexType> lexBuffer,
+                                          BiBuffer<LexUnit, String> errBuffer) {
+        lexBuffer.put(unit, unit.type());
+        return FormationType
+                .atLeastOne(lexBuffer.secondHalf())
+                .map(mi -> switch (mi.matching().type()) {
+                        case COMPLETE -> {
+                            List<LexUnit> units = lexBuffer.copyFirstHalf();
+                            lexBuffer.clear();
+                            errBuffer.clear();
+                            yield new Formation(mi.item(), null, units);
+                        }
+                        case PARTIAL -> null;
+                        case NO -> {
+                            errBuffer.put(unit, "Неожиданный " +  unit.type());
+                            yield null;
+                        }
+                    });
     }
 }

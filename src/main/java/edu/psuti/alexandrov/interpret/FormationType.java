@@ -160,14 +160,13 @@ public enum FormationType implements SubFormations {
         this.action = action;
     }
 
-    public static void atLeastOne(List<LexType> lexTypes, Consumer<MatchingItem<FormationType>> terminalOp) {
+    public static Optional<MatchingItem<FormationType>> atLeastOne(List<LexType> lexTypes) {
         AtomicInteger count = new AtomicInteger();
-        Arrays.stream(values())
+        return Arrays.stream(values())
                 .map(type -> new MatchingItem<>(type.expression.compute(lexTypes), type))
                 .sorted()
                 //.takeWhile(item -> count.getAndIncrement() > 0 || item.matching().isComplete())
-                .findFirst()
-                .ifPresent(terminalOp);
+                .findFirst();
     }
 
 
