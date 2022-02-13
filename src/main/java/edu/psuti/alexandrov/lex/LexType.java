@@ -27,7 +27,7 @@ public enum LexType {
     DELIMITER(2, compile("[:.]")),
     COMPARE_OP(2, compile("==|!=|>=|<=|>|<")),
     ADD_OP(2, compile("or|plus|minus")),
-    MULTIPLY_OP(2, compile("and|\\*|\\\\")),
+    MULTIPLY_OP(2, compile("and|\\*|/")),
     ASSIGN_OP(2, compile("[=]")),
     UNARY_OP(2, compile("[!]")),
     LISTING(2, compile("[,]")),
@@ -73,5 +73,13 @@ public enum LexType {
 
     public static Expression<LexType> expression() {
         return Expression.start();
+    }
+
+    public static boolean equals(LexType first, LexType second) {
+        return first.equals(second);
+    }
+
+    public static boolean notEquals(LexType first, LexType second) {
+        return !first.equals(second);
     }
 }

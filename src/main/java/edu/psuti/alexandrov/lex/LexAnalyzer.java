@@ -1,11 +1,11 @@
 package edu.psuti.alexandrov.lex;
 
-import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.interpret.Formation;
-import edu.psuti.alexandrov.interpret.FormationType;
+import edu.psuti.alexandrov.interpret.RuntimeContext;
 import edu.psuti.alexandrov.util.BiBuffer;
 import edu.psuti.alexandrov.util.IOUtil;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.MatchResult;
@@ -16,14 +16,13 @@ public class LexAnalyzer {
 
     private static final String LEX_DELIMITER = "%";
 
-    public static List<Formation> formations() {
-        final String content = IOUtil.readTxt("samples\\program1")
+    public static RuntimeContext toRuntimeContext() {
+        String content = IOUtil.readTxt("samples\\program1")
                 .replaceAll("\\s+", LEX_DELIMITER);
-        final StringBuilder sb = new StringBuilder(content);
-        final BiBuffer<LexUnit, LexType> lexBuffer = BiBuffer.basedOnLinkedList();
-        final BiBuffer<LexUnit, String> errBuffer = BiBuffer.basedOnLinkedList();
-        return LexType
-                .all()
+        StringBuilder sb = new StringBuilder(content);
+        BiBuffer<LexUnit, LexType> lexBuffer = BiBuffer.basedOnLinkedList();
+        BiBuffer<LexUnit, String> errBuffer = BiBuffer.basedOnLinkedList();
+        List<Formation> formations = LexType.all()
                 .flatMap(type -> type
                         .match(sb.toString())
                         .peek(result -> {
@@ -43,15 +42,13 @@ public class LexAnalyzer {
                                             case COMPLETE -> {
                                                 list.add(new Formation(mi.item(), lexBuffer.copyFirstHalf()));
                                                 lexBuffer.clear();
+                                                errBuffer.clear();
                                             }
-                                            case NO -> {
-                                                MatchResult result = unit.result();
-                                                errBuffer.put(unit, "Позиция " + result.start() + "-" + result.end()
-                                                                        + ": " +  unit.type() + " не ожидался здесь");
-                                            }
+                                            case NO -> errBuffer.put(unit, "Неожиданный " +  unit.type());
                                         }
                                     });
                         },
                         LinkedList::addAll);
+        return new RuntimeContext(new HashMap<>(), formations, errBuffer);
     }
 }

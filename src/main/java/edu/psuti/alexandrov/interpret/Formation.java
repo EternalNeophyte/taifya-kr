@@ -6,6 +6,8 @@ import edu.psuti.alexandrov.lex.LexUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static edu.psuti.alexandrov.lex.LexType.notEquals;
+
 /**
  * Created on 18.01.2022 by
  *
@@ -27,7 +29,7 @@ public record Formation(FormationType type, List<LexUnit> units) {
         }
     }
 
-    public List<LexUnit> getUnitsByType(LexType type) {
+    public List<LexUnit> unitsListOfType(LexType type) {
         UnitsTypeTree tree = Optional
                 .ofNullable(UnitsTypeTree.POOL.get(this))
                 .orElseGet(() -> {
@@ -38,5 +40,21 @@ public record Formation(FormationType type, List<LexUnit> units) {
         return tree.body.get(type);
     }
 
+    public LexUnit firstUnitOfType(LexType type) {
+        return unitsListOfType(type).get(0);
+    }
 
+    public boolean unitsHaveTypes(int start, int end, LexType... types) {
+        List<LexUnit> range = units.subList(start, end);
+        int rangeSize = units.size();
+        if(rangeSize != types.length) {
+            return false;
+        }
+        for(int i = 0; i < rangeSize; i++) {
+            if(notEquals(range.get(i).type(), types[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

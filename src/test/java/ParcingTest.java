@@ -94,14 +94,14 @@ public class ParcingTest {
 
     @Test
     public void testSemanticAnalysis() {
-        var c = LexAnalyzer.formations();
+        var c = LexAnalyzer.toRuntimeContext();
         c.toString();
     }
 
     @Test
     public void testIf() {
         var m = FormationType.IF_THEN_ELSE
-                .getExpression()
+                .expression()
                 .compute(LexType.IF_DEF,
                         LexType.IDENTIFIER,
                         LexType.COMPARE_OP,
