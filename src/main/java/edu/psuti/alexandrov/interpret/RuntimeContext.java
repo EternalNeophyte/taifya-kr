@@ -21,8 +21,7 @@ public record RuntimeContext(
     public void run() {
         if(errors.isEmpty()) {
             try {
-                formations.forEach(formation -> formation
-                        .type().action().accept(formation, this));
+                formations.forEach(formation -> formation.deployIn(this));
             }
             catch (IllegalLexException e) {
                 errors.put(e.unit(), e.getMessage());
