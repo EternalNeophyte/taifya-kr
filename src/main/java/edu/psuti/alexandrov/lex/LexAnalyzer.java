@@ -6,21 +6,31 @@ import edu.psuti.alexandrov.interpret.RuntimeContext;
 import edu.psuti.alexandrov.util.BiBuffer;
 import edu.psuti.alexandrov.util.IOUtil;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 
 public class LexAnalyzer {
 
     private static final String LEX_DELIMITER = "%";
+    private static final Pattern LINE_WRAPPING = Pattern.compile("\n|\r\n");
+
+    private static int[] getWrapPositions(String content) {
+        return LINE_WRAPPING
+                .matcher(content)
+                .results()
+                .mapToInt(MatchResult::start)
+                .toArray();
+    }
 
     public static RuntimeContext toRuntimeContext() {
-        String content = IOUtil.readTxt("samples\\program1")
-                .replaceAll("\\s+", LEX_DELIMITER);
-        StringBuilder sb = new StringBuilder(content);
+        String content = IOUtil.readTxt("samples\\program1");
+        int[] wrapPositions = getWrapPositions(content);
+        StringBuilder sb = new StringBuilder(content.replaceAll("\\s", LEX_DELIMITER));
+
         BiBuffer<LexUnit, LexType> lexBuffer = BiBuffer.basedOnLinkedList();
         BiBuffer<LexUnit, String> errBuffer = BiBuffer.basedOnLinkedList();
+
         List<Formation> formations = LexType.all()
                 .flatMap(type -> type
                         .match(sb.toString())
@@ -35,7 +45,8 @@ public class LexAnalyzer {
                 .collect(LinkedList::new,
                         (list, unit) -> findFormation(unit, lexBuffer, errBuffer).ifPresent(list::add),
                         LinkedList::addAll);
-        return new RuntimeContext(new HashMap<>(), formations, errBuffer);
+
+        return new RuntimeContext(new HashMap<>(), formations, errBuffer, wrapPositions);
     }
 
     public static Optional<Formation> findFormation(LexUnit unit,
