@@ -3,10 +3,12 @@ package edu.psuti.alexandrov.interpret;
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.lex.IllegalLexException;
+import edu.psuti.alexandrov.lex.LexAnalyzer;
 import edu.psuti.alexandrov.lex.LexType;
 import edu.psuti.alexandrov.lex.LexUnit;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -131,7 +133,13 @@ public enum FormationType implements SubFormations {
             .maybeOne(IDENTIFIER)
             .maybeOne(ASSIGN_OP)
             .maybeMany(LEX_TYPE_SAMPLER.merge(OPERAND, ARITHMETIC_OP))
-            .one(END_ARGS), emptyAction()),
+            .one(END_ARGS),
+
+            (formation, context) -> {
+                var l = formation.unitsListInRange(START_ARGS, END_ARGS);
+                var buffer = new LinkedList<>();
+                //LexAnalyzer.findFormation()
+            }),
 
     WHILE_LOOP(LexType.expression()
             .one(WHILE_LOOP_DEF)

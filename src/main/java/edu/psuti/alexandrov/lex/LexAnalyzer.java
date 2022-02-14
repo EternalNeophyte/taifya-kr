@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class LexAnalyzer {
 
     private static final String LEX_DELIMITER = "%";
-    private static final Pattern LINE_WRAPPING = Pattern.compile("\n|\r\n");
+    private static final Pattern LINE_WRAPPING = Pattern.compile("\n");
 
     private static int[] getWrapPositions(String content) {
         return LINE_WRAPPING
@@ -50,23 +50,24 @@ public class LexAnalyzer {
     }
 
     public static Optional<Formation> findFormation(LexUnit unit,
-                                          BiBuffer<LexUnit, LexType> lexBuffer,
-                                          BiBuffer<LexUnit, String> errBuffer) {
+                                                    BiBuffer<LexUnit, LexType> lexBuffer,
+                                                    BiBuffer<LexUnit, String> errBuffer) {
         lexBuffer.put(unit, unit.type());
         return FormationType
                 .atLeastOne(lexBuffer.secondHalf())
                 .map(mi -> switch (mi.matching().type()) {
-                        case COMPLETE -> {
-                            List<LexUnit> units = lexBuffer.copyFirstHalf();
-                            lexBuffer.clear();
-                            errBuffer.clear();
-                            yield new Formation(mi.item(), null, units);
-                        }
-                        case PARTIAL -> null;
-                        case NO -> {
-                            errBuffer.put(unit, "Неожиданный " +  unit.type());
-                            yield null;
-                        }
-                    });
+                                case COMPLETE -> {
+                                    List<LexUnit> units = lexBuffer.copyFirstHalf();
+                                    lexBuffer.clear();
+                                    errBuffer.clear();
+                                    yield Formation.of(mi.item(), units);
+                                }
+                                case PARTIAL -> null;
+                                case NO -> {
+                                    errBuffer.put(unit, "Неожиданный " +  unit.type());
+                                    yield null;
+                                }
+                            }
+                );
     }
 }

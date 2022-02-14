@@ -15,8 +15,9 @@ import static edu.psuti.alexandrov.lex.LexType.notEquals;
  */
 public record Formation(FormationType type, List<Formation> nested, List<LexUnit> units) {
 
-
-    //Maybe List<Formation> nested
+    public static Formation of(FormationType type, List<LexUnit> units) {
+        return new Formation(type, new LinkedList<>(), units);
+    }
 
     public class UnitsTypeTree {
 
@@ -73,9 +74,7 @@ public record Formation(FormationType type, List<Formation> nested, List<LexUnit
     }
 
     public void deployIn(RuntimeContext context) {
-        if(Objects.nonNull(nested)) {
-            nested.forEach(formation -> formation.deployIn(context));
-        }
+        nested.forEach(formation -> formation.deployIn(context));
         type.action().accept(this, context);
     }
 }
