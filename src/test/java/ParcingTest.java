@@ -93,12 +93,6 @@ public class ParcingTest {
     }
 
     @Test
-    public void testSemanticAnalysis() {
-        var c = LexAnalyzer.toRuntimeContext();
-        c.toString();
-    }
-
-    @Test
     public void testIf() {
         var m = FormationType.IF_THEN_ELSE
                 .expression()

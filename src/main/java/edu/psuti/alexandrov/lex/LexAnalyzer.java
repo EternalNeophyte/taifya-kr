@@ -23,8 +23,7 @@ public class LexAnalyzer {
                 .toArray();
     }
 
-    public static RuntimeContext toRuntimeContext() {
-        String content = IOUtil.readTxt("samples\\program1");
+    public static RuntimeContext setupRuntimeContext(String content) {
         int[] wrapPositions = getWrapPositions(content);
         StringBuilder sb = new StringBuilder(content.replaceAll("\\s", LEX_DELIMITER));
 
