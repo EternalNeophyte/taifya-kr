@@ -21,6 +21,8 @@ import static edu.psuti.alexandrov.lex.LexType.*;
 
 public enum FormationType implements SubFormations {
 
+    INCORRECT(null, null),
+
     COMMENT(LexType.expression().many(COMMENT_BODY), emptyAction()),
 
     END(LexType.expression().one(END_PROGRAM), emptyAction()),

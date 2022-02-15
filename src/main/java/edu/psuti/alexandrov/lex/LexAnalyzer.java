@@ -44,7 +44,9 @@ public class LexAnalyzer {
                 .collect(LinkedList::new,
                         (list, unit) -> findFormation(unit, lexBuffer, errBuffer).ifPresent(list::add),
                         LinkedList::addAll);
-
+        if(!lexBuffer.isEmpty()) {
+            formations.add(Formation.of(FormationType.INCORRECT, lexBuffer.firstHalf()));
+        }
         return new RuntimeContext(new HashMap<>(), formations, errBuffer, wrapPositions);
     }
 

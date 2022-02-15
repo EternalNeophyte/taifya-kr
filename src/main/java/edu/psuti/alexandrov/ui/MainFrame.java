@@ -8,10 +8,8 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainFrame extends JFrame {
 
@@ -19,11 +17,14 @@ public class MainFrame extends JFrame {
     private final JTextArea outputArea;
     private final JButton deployButton;
 
+    private final AtomicInteger cursor;
+
     public MainFrame(String title) {
         super(title);
         codePane = setupCodePane();
         outputArea = setupOutputArea();
         deployButton = setupDeployButton();
+        cursor = new AtomicInteger();
         setupSelf();
     }
 
@@ -48,18 +49,19 @@ public class MainFrame extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 String content = codePane.getText();
                 codePane.setText("");
+                cursor.set(0);
                 LexAnalyzer.setupRuntimeContext(content)
                         .formations()
                         .forEach(formation -> formation
                                 .units()
                                 .forEach(unit -> {
-                                    String text = unit.result().group();
+                                    int end = unit.result().end();
+                                    String highLighted = content.substring(cursor.getAndSet(end), end);
                                     switch (unit.type()) {
-                                        case IDENTIFIER -> addColoredText(text, Color.BLUE);
-                                        default -> addColoredText(text, Color.LIGHT_GRAY);
+                                        case IDENTIFIER -> addColoredText(highLighted, Color.BLUE);
+                                        default -> addColoredText(highLighted, Color.LIGHT_GRAY);
                                     }
                                 }));
-                //codeArea.append("Clicked ");
             }
         });
         return button;
