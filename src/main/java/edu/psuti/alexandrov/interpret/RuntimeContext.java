@@ -34,7 +34,7 @@ public record RuntimeContext(
     public void tryRun() {
         if(!formations.get(formations.size() - 1)
                         .type().equals(FormationType.END)) {
-            errors.put(LexUnit.STUB, "Не найден 'END' в конце программы");
+            errors.put(null, "Не найден 'END' в конце программы");
         }
         if(errors.isEmpty()) {
             try {
@@ -44,7 +44,7 @@ public record RuntimeContext(
                 errors.put(e.unit(), e.getMessage());
             }
             catch (RuntimeException e) {
-                errors.put(LexUnit.STUB, e.getMessage());
+                errors.put(null, e.getMessage());
             }
         }
     }

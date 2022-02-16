@@ -3,7 +3,6 @@ package edu.psuti.alexandrov.ui;
 import edu.psuti.alexandrov.interpret.RuntimeContext;
 import edu.psuti.alexandrov.lex.LexAnalyzer;
 import edu.psuti.alexandrov.lex.LexHighlighting;
-import edu.psuti.alexandrov.lex.LexUnit;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -21,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static edu.psuti.alexandrov.interpret.FormationType.INCORRECT;
-import static edu.psuti.alexandrov.lex.LexUnit.STUB;
 
 public class MainFrame extends JFrame implements LexHighlighting {
 
@@ -77,8 +75,7 @@ public class MainFrame extends JFrame implements LexHighlighting {
                 outputArea.setForeground(FIRE);
                 context.errors()
                         .forEach((unit, message) -> {
-                                String outputLine = Optional.of(unit)
-                                        .filter(u -> !u.equals(STUB))
+                                String outputLine = Optional.ofNullable(unit)
                                         .map(context::computePosition)
                                         .map(pos -> String.format("Строка %d, cтолбец %d: %s\n", pos.line(), pos.column() , message))
                                         .orElse(message);
