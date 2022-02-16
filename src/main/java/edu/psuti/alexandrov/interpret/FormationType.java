@@ -3,7 +3,6 @@ package edu.psuti.alexandrov.interpret;
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.lex.IllegalLexException;
-import edu.psuti.alexandrov.lex.LexAnalyzer;
 import edu.psuti.alexandrov.lex.LexType;
 import edu.psuti.alexandrov.lex.LexUnit;
 
@@ -11,9 +10,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.regex.MatchResult;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static edu.psuti.alexandrov.interpret.BiAction.emptyAction;
@@ -159,7 +158,23 @@ public enum FormationType implements SubFormations {
             .one(OUTPUT_DEF)
             .one(START_ARGS)
             .maybeMany(ANYTHING)
-            .one(END_ARGS), emptyAction())
+            .one(END_ARGS),
+
+            (formation, context) -> {
+                var variables = context.variables();
+                String output = formation
+                        .units()
+                        .stream()
+                        .map(LexUnit::result)
+                        .map(MatchResult::group)
+                        .map(group -> Optional.of(group)
+                                        .map(variables::get)
+                                        .map(Container::value)
+                                        .map(Object::toString)
+                                        .orElse(group))
+                        .collect(Collectors.joining("\\s"));
+
+            })
     ;
 
     private final Expression<LexType> expression;
@@ -171,11 +186,10 @@ public enum FormationType implements SubFormations {
     }
 
     public static Optional<MatchingItem<FormationType>> atLeastOne(List<LexType> lexTypes) {
-        AtomicInteger count = new AtomicInteger();
         return Arrays.stream(values())
+                .skip(1)
                 .map(type -> new MatchingItem<>(type.expression.compute(lexTypes), type))
                 .sorted()
-                //.takeWhile(item -> count.getAndIncrement() > 0 || item.matching().isComplete())
                 .findFirst();
     }
 

@@ -10,6 +10,10 @@ public abstract class Container<T> {
 
     T value;
 
+    public T value() {
+        return value;
+    }
+
     public void put(LexUnit newValue) {
         try {
             value = parseValue(newValue.result().group());

@@ -65,7 +65,7 @@ public class LexAnalyzer {
                                 }
                                 case PARTIAL -> null;
                                 case NO -> {
-                                    errBuffer.put(unit, "Неожиданный " +  unit.type());
+                                    errBuffer.put(unit, unit.type().description() + " не ожидается здесь");
                                     yield null;
                                 }
                             }

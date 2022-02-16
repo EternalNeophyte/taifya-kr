@@ -12,7 +12,5 @@ public class Runner {
         FlatAtomOneDarkContrastIJTheme.setup();
         UIManager.getLookAndFeelDefaults().put("TextPane.font", new Font("Segoe UI", Font.BOLD, 18));
         new MainFrame("Курсовая по ТАиФЯ");
-        //ToDo маппинг юнитов на неправильную формацию, новые поля LexType для подсветки и локализации
-        //LexAnalyzer.toRuntimeContext().run();
     }
 }

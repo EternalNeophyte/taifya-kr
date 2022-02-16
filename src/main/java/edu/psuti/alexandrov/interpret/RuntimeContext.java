@@ -18,19 +18,24 @@ public record RuntimeContext(
         BiBuffer<LexUnit, String> errors,
         int[] wrapPositions) {
 
+    //List runnables
 
     public static record LexPosition(int line, int column) { }
 
     public LexPosition computePosition(LexUnit unit) {
         int line = 0, flatPos = unit.result().start();
-        while (wrapPositions[line] < flatPos) {
+        while (line < wrapPositions.length && wrapPositions[line] < flatPos) {
             line++;
         }
         int column = line > 0 ? flatPos - wrapPositions[line - 1] : flatPos;
         return new LexPosition(line + 1, column);
     }
 
-    public void run() {
+    public void tryRun() {
+        if(!formations.get(formations.size() - 1)
+                        .type().equals(FormationType.END)) {
+            errors.put(LexUnit.STUB, "Не найден 'END' в конце программы");
+        }
         if(errors.isEmpty()) {
             try {
                 formations.forEach(formation -> formation.deployIn(this));
@@ -42,9 +47,5 @@ public record RuntimeContext(
                 errors.put(LexUnit.STUB, e.getMessage());
             }
         }
-        errors.forEach((unit, message) -> {
-            LexPosition position = computePosition(unit);
-            System.out.printf("Строка %-4d | Cтолбец %-4d | %s\n", position.line(), position.column(), message);
-        });
     }
 }
