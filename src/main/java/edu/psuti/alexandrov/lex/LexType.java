@@ -12,7 +12,7 @@ import static java.util.regex.Pattern.compile;
 
 public enum LexType implements LexHighlighting {
 
-    COMMENT_BODY(0, "Блок комментариев", compile("[{][\\s\\S]*[}]"), GRAY_DUST),
+    COMMENT_BODY(0, "Тело комментария", compile("[{][\\s\\S]*[}]"), GRAY_DUST),
 
     LOGIC_CONST(1, "Логическая константа", compile("true|false"), ARCTIC_GRASS),
     TYPE_DEF(1, "Объявление типа", compile("integer|real|boolean"), LILY),
@@ -46,7 +46,8 @@ public enum LexType implements LexHighlighting {
     END_STATEMENT(2, "Конец утверждения", compile("[;]"), LILY),
     END_PROGRAM(0, "Конец программы", compile("end"), LILY),
 
-    IDENTIFIER(3, "Идентификатор", compile("[a-zA-Z][\\w]*"), SKY_BLUE);
+    IDENTIFIER(3, "Идентификатор", compile("[a-zA-Z][\\w]*"), SKY_BLUE),
+    OUTPUT_TEXT(0, "Текст для вывода", compile("[а-яА-ЯЁё\\w\\s]+"), SAKURA_SNOW);
 
     private final int tableNum;
     private final String description;

@@ -1,14 +1,19 @@
 package edu.psuti.alexandrov.interpret;
 
-public class IntegerContainer extends Container<Integer> {
+public class IntContainer extends Container<Integer> {
 
     @Override
     Integer parseValue(String newValue) {
-        StringBuilder sb = new StringBuilder(newValue);
-        if(newValue.endsWith("b")) {
-            sb.deleteCharAt(sb.length() - 1).insert(0, "0b");
-        }
-        return Integer.parseInt(sb.toString());
+        String lowered = newValue.toLowerCase();
+        int lastIndex = lowered.length() - 1;
+        char radixChar = lowered.charAt(lastIndex);
+        return switch(radixChar) {
+            case 'b' -> Integer.parseInt(lowered.substring(0, lastIndex), 2);
+            case 'o' -> Integer.parseInt(lowered.substring(0, lastIndex), 8);
+            case 'd' -> Integer.parseInt(lowered.substring(0, lastIndex));
+            case 'h' -> Integer.parseInt(lowered.substring(0, lastIndex), 16);
+            default -> Integer.parseInt(lowered);
+        };
     }
 
     @Override

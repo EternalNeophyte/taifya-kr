@@ -109,4 +109,13 @@ public class ParcingTest {
         m.toString();
     }
 
+    @Test
+    public void testParseNumbers() {
+        double f = Double.parseDouble(".4535");
+        double d = Double.parseDouble("0.245e-17");
+        toString();
+
+    }
+
+
 }

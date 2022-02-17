@@ -108,4 +108,20 @@ public record Formation(FormationType type, List<Formation> nested, List<LexUnit
         nested.forEach(formation -> formation.deployIn(context));
         type.action().accept(this, context);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("\n").append(type);
+        for(int i = 0; i < units.size(); i++) {
+            LexUnit unit = units.get(i);
+            sb.append(String.format("\n%3d. %s [%s]", i + 1, unit.type(), unit));
+        }
+        if(!nested.isEmpty()) {
+            sb.append("Вложенные конструкции (").append(type)
+                                                .append(") {\n");
+            nested.forEach(sb::append);
+            sb.append("\n}");
+        }
+        return sb.toString();
+    }
 }

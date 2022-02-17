@@ -21,13 +21,14 @@ import static java.util.Objects.nonNull;
 
 public enum FormationType implements SubFormations {
 
-    INCORRECT(null, null),
+    INCORRECT("Неправильная лексическая конструкция", null, null),
 
-    COMMENT(LexType.expression().many(COMMENT_BODY), emptyAction()),
+    COMMENT("Комментарий", LexType.expression().many(COMMENT_BODY), emptyAction()),
 
-    END(LexType.expression().one(END_PROGRAM), emptyAction()),
+    END("Объявление конца программы", LexType.expression().one(END_PROGRAM), emptyAction()),
 
-    VAR_DEF(LexType.expression()
+    VAR_DEF("Объявление переменной",
+            LexType.expression()
             .one(IDENTIFIER)
             .maybeCarousel(LISTING, IDENTIFIER)
             .one(DELIMITER)
@@ -38,7 +39,7 @@ public enum FormationType implements SubFormations {
                 var variables = context.variables();
                 String typeDef = formation.firstUnitOfTypeOrThrow(TYPE_DEF).toString();
                 Consumer<MatchResult> putVariableFunc = switch (typeDef) {
-                    case "integer" -> result -> variables.put(result.group(), new IntegerContainer());
+                    case "integer" -> result -> variables.put(result.group(), new IntContainer());
                     case "real" -> result -> variables.put(result.group(), new RealContainer());
                     case "boolean" -> result -> variables.put(result.group(), new BooleanContainer());
                     default -> throw new IllegalArgumentException("Недопустимый тип переменной");
@@ -54,7 +55,9 @@ public enum FormationType implements SubFormations {
                         });
             }),
 
-    VAR_ASSIGN_VALUE(LexType.expression()
+
+    VAR_ASSIGN_VALUE("Операция присваивания",
+            LexType.expression()
             .maybeOne(ASSIGN_DEF)
             .one(IDENTIFIER)
             .one(ASSIGN_OP)
@@ -73,47 +76,60 @@ public enum FormationType implements SubFormations {
                 }
             }),
 
-    COMPARISION(LexType.expression()
+
+    COMPARISION("Операция сравнения",
+            LexType.expression()
             .maybeOne(START_ARGS)
             .one(OPERAND)
             .one(COMPARE_OP)
             .one(OPERAND)
             .maybeOne(END_ARGS), emptyAction()),
 
-    COMPARISION_EXTRA_OP(LexType.expression()
+
+    COMPARISION_EXTRA_OP("Оператор сравнения",
+            LexType.expression()
             .one(ADD_OP)
             .maybeOne(START_ARGS)
             .one(OPERAND)
             .maybeOne(END_ARGS), emptyAction()),
 
-    ADDITION(LexType.expression()
+
+    ADDITION("Оператор сложения",
+            LexType.expression()
             .maybeOne(START_ARGS)
             .one(OPERAND)
             .one(ADD_OP)
             .one(OPERAND)
             .maybeOne(END_ARGS), emptyAction()),
 
-    ADDITION_EXTRA_OP(LexType.expression()
+
+    ADDITION_EXTRA_OP("Дополнение к оператору сложения",
+            LexType.expression()
             .one(ADD_OP)
             .maybeOne(START_ARGS)
             .one(OPERAND)
             .maybeOne(END_ARGS), emptyAction()),
 
-    MULTIPLICATION(LexType.expression()
+
+    MULTIPLICATION("Оператор умножения",
+            LexType.expression()
             .maybeOne(START_ARGS)
             .one(OPERAND)
             .one(MULTIPLY_OP)
             .one(OPERAND)
             .maybeOne(END_ARGS), emptyAction()),
 
-    MULTIPLICATION_EXTRA_OP(LexType.expression()
+
+    MULTIPLICATION_EXTRA_OP("Дополнение к оператору умножения",
+            LexType.expression()
             .one(MULTIPLY_OP)
             .maybeOne(START_ARGS)
             .one(OPERAND)
             .maybeOne(END_ARGS), emptyAction()),
 
     //Needs further check
-    IF_THEN_ELSE(LexType.expression()
+    IF_THEN_ELSE("Оператор условного перехода",
+            LexType.expression()
             .one(IF_DEF)
             .many(LEX_TYPE_SAMPLER.exclude(ANYTHING, IF_DEF, THEN_SECTION, END_IF))
             .one(THEN_SECTION)
@@ -121,7 +137,8 @@ public enum FormationType implements SubFormations {
             .one(END_IF), emptyAction()),
 
     //Needs further check
-    FOR_LOOP(LexType.expression()
+    FOR_LOOP("Оператор цикла с фиксированным числом повторений",
+            LexType.expression()
             .one(FOR_LOOP_DEF)
             .one(START_ARGS)
             .maybeOne(IDENTIFIER)
@@ -143,45 +160,50 @@ public enum FormationType implements SubFormations {
                 //LexAnalyzer.findFormation()
             }),
 
-    WHILE_LOOP(LexType.expression()
+    WHILE_LOOP("Условный оператор цикла",
+            LexType.expression()
             .one(WHILE_LOOP_DEF)
             .maybeMany(ANYTHING)
             .one(END_WHILE_LOOP), emptyAction()),
 
-    INPUT(LexType.expression()
+    INPUT("Оператор ввода",
+            LexType.expression()
             .one(INPUT_DEF)
             .one(START_ARGS)
             .one(IDENTIFIER)
             .maybeMany(IDENTIFIER)
             .one(END_ARGS), emptyAction()),
 
-    OUTPUT(LexType.expression()
+    OUTPUT("Оператор вывода",
+            LexType.expression()
             .one(OUTPUT_DEF)
             .one(START_ARGS)
-            .maybeMany(ANYTHING)
+            .maybeMany(LEX_TYPE_SAMPLER.exclude(ANYTHING, END_ARGS))
             .one(END_ARGS),
 
             (formation, context) -> {
                 var variables = context.variables();
-                String output = formation
-                        .units()
+                var units = formation.units();
+                String output = units
+                        .subList(2, units.size() - 1)
                         .stream()
-                        .map(LexUnit::result)
-                        .map(MatchResult::group)
-                        .map(group -> Optional.of(group)
+                        .map(LexUnit::toString)
+                        .map(unitDef -> Optional.of(unitDef)
                                         .map(variables::get)
                                         .map(Container::value)
                                         .map(Object::toString)
-                                        .orElse(group))
-                        .collect(Collectors.joining("\\s"));
-
+                                        .orElse(unitDef))
+                        .collect(Collectors.joining(" ", "", "\n"));
+                context.textHandlers().add(textArea -> textArea.append(output));
             })
     ;
 
+    private final String description;
     private final Expression<LexType> expression;
     private final BiAction<Formation, RuntimeContext> action;
 
-    FormationType(Expression<LexType> expression, BiAction<Formation, RuntimeContext> action) {
+    FormationType(String description, Expression<LexType> expression, BiAction<Formation, RuntimeContext> action) {
+        this.description = description;
         this.expression = expression;
         this.action = action;
     }
@@ -205,5 +227,10 @@ public enum FormationType implements SubFormations {
 
     public BiAction<Formation, RuntimeContext> action() {
         return action;
+    }
+
+    @Override
+    public String toString() {
+        return description;
     }
 }

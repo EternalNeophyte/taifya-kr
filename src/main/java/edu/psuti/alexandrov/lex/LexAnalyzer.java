@@ -46,7 +46,8 @@ public class LexAnalyzer {
         if(!lexBuffer.isEmpty()) {
             formations.add(Formation.of(FormationType.INCORRECT, lexBuffer.firstHalf()));
         }
-        return new RuntimeContext(new HashMap<>(), formations, errBuffer, wrapPositions);
+        return new RuntimeContext(new HashMap<>(), formations,
+                                new LinkedList<>(), errBuffer, wrapPositions);
     }
 
     public static Optional<Formation> findFormation(LexUnit unit,

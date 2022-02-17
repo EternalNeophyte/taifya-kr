@@ -4,8 +4,10 @@ import edu.psuti.alexandrov.lex.IllegalLexException;
 import edu.psuti.alexandrov.lex.LexUnit;
 import edu.psuti.alexandrov.util.BiBuffer;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Created on 17.01.2022 by
@@ -15,6 +17,7 @@ import java.util.Map;
 public record RuntimeContext(
         Map<String, Container<?>> variables,
         List<Formation> formations,
+        List<Consumer<JTextArea>> textHandlers,
         BiBuffer<LexUnit, String> errors,
         int[] wrapPositions) {
 
@@ -31,9 +34,13 @@ public record RuntimeContext(
         return new LexPosition(line + 1, column + 1);
     }
 
-    public void tryRun() {
-        if(!formations.get(formations.size() - 1)
-                        .type().equals(FormationType.END)) {
+    public boolean hasEnd() {
+        return !formations.isEmpty() && formations.get(formations.size() - 1)
+                                                    .type().equals(FormationType.END);
+    }
+
+    public boolean runWithoutErrors() {
+        if(!hasEnd()) {
             errors.put(null, "Не найден 'END' в конце программы");
         }
         if(errors.isEmpty()) {
@@ -47,5 +54,6 @@ public record RuntimeContext(
                 errors.put(null, e.getMessage());
             }
         }
+        return errors.isEmpty();
     }
 }
