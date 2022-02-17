@@ -8,11 +8,7 @@ import java.util.stream.Collectors;
 
 import static edu.psuti.alexandrov.lex.LexType.notEquals;
 
-/**
- * Created on 18.01.2022 by
- *
- * @author alexandrov
- */
+
 public record Formation(FormationType type, List<Formation> nested, List<LexUnit> units) {
 
     public static Formation of(FormationType type, List<LexUnit> units) {
@@ -26,11 +22,40 @@ public record Formation(FormationType type, List<Formation> nested, List<LexUnit
                 .stream()
                 .collect(Collectors.groupingBy(LexUnit::type));
 
-        private UnitsTypeTree() {
-        }
+        private UnitsTypeTree() { }
     }
 
-    public List<LexUnit> unitsListOfType(LexType type) {
+    public LexUnit firstUnitOfTypeOrThrow(LexType... types) {
+        return orderedUnitOfType(0, types)
+                .orElseThrow(() -> new IllegalArgumentException("Ошибка интерпретатора:" +
+                                            " не найдено ни одной лекс. единицы среди типов" +
+                                            Arrays.toString(types)));
+    }
+
+    public Optional<LexUnit> firstUnitOfType(LexType... types) {
+        return orderedUnitOfType(0, types);
+    }
+
+    public LexUnit orderedUnitOfTypeOrThrow(int order, LexType... types) {
+        return orderedUnitOfType(0, types)
+                .orElseThrow(() -> new IllegalArgumentException("Ошибка интерпретатора:" +
+                                            " вхождение лекс. единицы [" + order +
+                                            "] не найдено среди типов" + Arrays.toString(types)));
+    }
+
+    public Optional<LexUnit> orderedUnitOfType(int order, LexType... types) {
+        return Optional.of(unitsListOfType(types))
+                .map(list -> {
+                    try {
+                        return list.get(order);
+                    }
+                    catch (IndexOutOfBoundsException e) {
+                        return null;
+                    }
+                });
+    }
+
+    public List<LexUnit> unitsListOfType(LexType... types) {
         UnitsTypeTree tree = UnitsTypeTree.POOL.get(this);
         return Optional.ofNullable(tree)
                 .or(() -> {
@@ -38,21 +63,27 @@ public record Formation(FormationType type, List<Formation> nested, List<LexUnit
                     UnitsTypeTree.POOL.put(this, newTree);
                     return Optional.of(newTree);
                 })
-                .map(t -> t.body.get(type))
-                .orElse(Collections.emptyList());
-    }
-
-    public LexUnit firstUnitOfType(LexType type) {
-        return Optional.of(unitsListOfType(type))
-                .filter(list -> !list.isEmpty())
-                .map(list -> list.get(0))
-                .orElseThrow(() -> new RuntimeException("Не найдено ни одной лекс. единицы типа " + type));
+                .map(t -> Arrays.stream(types)
+                        .map(t.body::get)
+                        .filter(Objects::nonNull)
+                        .flatMap(List::stream)
+                        .toList())
+                .orElseGet(Collections::emptyList);
     }
 
     public List<LexUnit> unitsListInRange(LexType start, LexType end) {
-        LexUnit first = firstUnitOfType(start);
-        LexUnit last = firstUnitOfType(end);
-        return units.subList(units.indexOf(first), units.indexOf(last));
+        return orderedUnitOfType(0, start)
+                .flatMap(first -> orderedUnitOfType(0, end)
+                                    .map(last -> {
+                                            try {
+                                                return units.subList(units.indexOf(first),
+                                                                    units.indexOf(last));
+                                            }
+                                            catch (IndexOutOfBoundsException e) {
+                                                return null;
+                                            }
+                                    }))
+                .orElseGet(Collections::emptyList);
     }
 
     public boolean unitsHaveTypes(int start, int end, LexType... types) {

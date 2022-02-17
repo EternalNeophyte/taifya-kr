@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import static edu.psuti.alexandrov.interpret.BiAction.emptyAction;
 import static edu.psuti.alexandrov.lex.LexType.*;
+import static java.util.Objects.nonNull;
 
 public enum FormationType implements SubFormations {
 
@@ -35,9 +36,7 @@ public enum FormationType implements SubFormations {
 
             (formation, context) -> {
                 var variables = context.variables();
-                String typeDef = formation.firstUnitOfType(TYPE_DEF)
-                        .result()
-                        .group();
+                String typeDef = formation.firstUnitOfTypeOrThrow(TYPE_DEF).toString();
                 Consumer<MatchResult> putVariableFunc = switch (typeDef) {
                     case "integer" -> result -> variables.put(result.group(), new IntegerContainer());
                     case "real" -> result -> variables.put(result.group(), new RealContainer());
@@ -62,14 +61,16 @@ public enum FormationType implements SubFormations {
             .one(OPERAND),
 
             (formation, context) -> {
-                LexUnit unit = formation.firstUnitOfType(IDENTIFIER);
-                String name = unit.result().group();
+                LexUnit id = formation.firstUnitOfTypeOrThrow(IDENTIFIER);
+                String name = id.toString();
                 Container<?> container = context.variables().get(name);
-                Optional.ofNullable(container)
-                        .ifPresentOrElse(c -> c.put(unit), () -> {
-                            throw new IllegalLexException("Переменная '" + name +
-                                                " ' еще не была объявлена", unit);
-                        });
+                if(nonNull(container)) {
+                    container.put(formation.firstUnitOfTypeOrThrow(RIGHT_VALUE));
+                }
+                else {
+                    throw new IllegalLexException("Переменная '" + name +
+                                                "' еще не была объявлена", id);
+                }
             }),
 
     COMPARISION(LexType.expression()

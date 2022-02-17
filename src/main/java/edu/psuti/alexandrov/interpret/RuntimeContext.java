@@ -28,7 +28,7 @@ public record RuntimeContext(
             line++;
         }
         int column = line > 0 ? flatPos - wrapPositions[line - 1] : flatPos;
-        return new LexPosition(line + 1, column);
+        return new LexPosition(line + 1, column + 1);
     }
 
     public void tryRun() {

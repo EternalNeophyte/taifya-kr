@@ -23,7 +23,7 @@ import static edu.psuti.alexandrov.interpret.FormationType.INCORRECT;
 
 public class MainFrame extends JFrame implements LexHighlighting {
 
-    private static final int TYPE_RATE = 4;
+    private static final int TYPE_RATE = 2;
 
     private final JTextPane codePane;
     private final JTextArea outputArea;

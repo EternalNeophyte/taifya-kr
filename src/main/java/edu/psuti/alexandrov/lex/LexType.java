@@ -64,10 +64,6 @@ public enum LexType implements LexHighlighting {
         return tableNum;
     }
 
-    public String description() {
-        return description;
-    }
-
     public Pattern pattern() {
         return pattern;
     }
@@ -95,5 +91,10 @@ public enum LexType implements LexHighlighting {
 
     public static boolean notEquals(LexType first, LexType second) {
         return !first.equals(second);
+    }
+
+    @Override
+    public String toString() {
+        return description;
     }
 }

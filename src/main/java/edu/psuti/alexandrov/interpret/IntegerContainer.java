@@ -4,7 +4,11 @@ public class IntegerContainer extends Container<Integer> {
 
     @Override
     Integer parseValue(String newValue) {
-        return Integer.parseInt(newValue);
+        StringBuilder sb = new StringBuilder(newValue);
+        if(newValue.endsWith("b")) {
+            sb.deleteCharAt(sb.length() - 1).insert(0, "0b");
+        }
+        return Integer.parseInt(sb.toString());
     }
 
     @Override

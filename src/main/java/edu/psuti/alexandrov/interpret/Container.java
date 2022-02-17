@@ -16,16 +16,16 @@ public abstract class Container<T> {
 
     public void put(LexUnit newValue) {
         try {
-            value = parseValue(newValue.result().group());
+            value = parseValue(newValue.toString());
         }
         catch (Throwable e) {
-            throw new IllegalLexException("Тип присваемого значения не соответствует " +
+            throw new IllegalLexException("Тип присваиваемого значения не соответствует " +
                                             "типу переменной", newValue);
         }
     }
 
     public final T compute(LexUnit op, T operand) {
-        String opDef = op.result().group();
+        String opDef = op.toString();
         LexType opType = op.type();
         if(notEquals(opType, ADD_OP) && notEquals(opType, MULTIPLY_OP)) {
             throw new IllegalLexException("Ожидалась операция вычисления вместо " + op.type(), op);
@@ -34,7 +34,7 @@ public abstract class Container<T> {
     }
 
     public final boolean compare(LexUnit op, T operand) {
-        String opDef = op.result().group();
+        String opDef = op.toString();
         if(notEquals(op.type(), COMPARE_OP)) {
             throw new IllegalLexException("Ожидалась операция сравнения вместо " + op.type(), op);
         }

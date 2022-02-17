@@ -4,7 +4,6 @@ import edu.psuti.alexandrov.interpret.Formation;
 import edu.psuti.alexandrov.interpret.FormationType;
 import edu.psuti.alexandrov.interpret.RuntimeContext;
 import edu.psuti.alexandrov.util.BiBuffer;
-import edu.psuti.alexandrov.util.IOUtil;
 
 import java.util.*;
 import java.util.regex.MatchResult;
@@ -65,7 +64,7 @@ public class LexAnalyzer {
                                 }
                                 case PARTIAL -> null;
                                 case NO -> {
-                                    errBuffer.put(unit, unit.type().description() + " не ожидается здесь");
+                                    errBuffer.put(unit, unit.type() + " не ожидается здесь");
                                     yield null;
                                 }
                             }
