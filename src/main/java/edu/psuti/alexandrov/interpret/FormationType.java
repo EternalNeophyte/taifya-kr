@@ -5,7 +5,10 @@ import edu.psuti.alexandrov.exp.MatchingItem;
 import edu.psuti.alexandrov.lex.IllegalLexException;
 import edu.psuti.alexandrov.lex.LexType;
 import edu.psuti.alexandrov.lex.LexUnit;
+import edu.psuti.alexandrov.ui.ReleaseKeyListener;
 
+import javax.swing.*;
+import java.awt.event.KeyListener;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +47,7 @@ public enum FormationType implements SubFormations {
                     case "boolean" -> result -> variables.put(result.group(), new BooleanContainer());
                     default -> throw new IllegalArgumentException("Недопустимый тип переменной");
                 };
-                formation.unitsListOfType(IDENTIFIER)
+                formation.unitsOfType(IDENTIFIER)
                         .forEach(unit -> {
                             MatchResult result = unit.result();
                             String name = result.group();
@@ -83,7 +86,13 @@ public enum FormationType implements SubFormations {
             .one(OPERAND)
             .one(COMPARE_OP)
             .one(OPERAND)
-            .maybeOne(END_ARGS), emptyAction()),
+            .maybeOne(END_ARGS),
+
+            ((formation, context) -> {
+                LexUnit left = formation.orderedUnitOfTypeOrThrow(0, OPERAND);
+                LexUnit right = formation.orderedUnitOfTypeOrThrow(1, OPERAND);
+                //...
+            })),
 
 
     COMPARISION_EXTRA_OP("Оператор сравнения",
@@ -155,7 +164,7 @@ public enum FormationType implements SubFormations {
             .one(END_ARGS),
 
             (formation, context) -> {
-                var l = formation.unitsListInRange(START_ARGS, END_ARGS);
+                var l = formation.unitsBetween(START_ARGS, END_ARGS);
                 var buffer = new LinkedList<>();
                 //LexAnalyzer.findFormation()
             }),
@@ -172,7 +181,29 @@ public enum FormationType implements SubFormations {
             .one(START_ARGS)
             .one(IDENTIFIER)
             .maybeMany(IDENTIFIER)
-            .one(END_ARGS), emptyAction()),
+            .one(END_ARGS),
+
+            (formation, context) -> {
+                StringBuilder sb = new StringBuilder();
+                context.uiHandlers()
+                        .add(ui -> {
+                                JTextPane pane = ui.outputPane();
+                                ui.writeColoredText(pane, "Введите значение и нажмите 'Enter': ", SKY_BLUE);
+
+                                //ToDo реализовать ожидание программы при инпуте
+                                ReleaseKeyListener listener = e -> {
+                                    String input = pane.getText();
+                                    sb.append(input.substring(input.lastIndexOf(" ")));
+                                    formation.unitsBetween(START_ARGS, END_ARGS)
+                                            .forEach(id -> context.optionalOfVar(id)
+                                                    .ifPresent(found -> found.put(sb.toString()))
+                                            );
+                                };
+                                pane.addKeyListener(listener);
+
+                        });
+
+            }),
 
     OUTPUT("Оператор вывода",
             LexType.expression()
@@ -182,19 +213,15 @@ public enum FormationType implements SubFormations {
             .one(END_ARGS),
 
             (formation, context) -> {
-                var variables = context.variables();
-                var units = formation.units();
-                String output = units
-                        .subList(2, units.size() - 1)
+                String output = formation.unitsBetween(START_ARGS, END_ARGS)
                         .stream()
-                        .map(LexUnit::toString)
-                        .map(unitDef -> Optional.of(unitDef)
-                                        .map(variables::get)
+                        .map(unit -> context.optionalOfVar(unit)
                                         .map(Container::value)
                                         .map(Object::toString)
-                                        .orElse(unitDef))
+                                        .orElse(unit.toString()))
                         .collect(Collectors.joining(" ", "", "\n"));
-                context.textHandlers().add(textArea -> textArea.append(output));
+                context.uiHandlers()
+                        .add(ui -> ui.writeColoredText(ui.outputPane(), output, SAKURA_SNOW));
             })
     ;
 

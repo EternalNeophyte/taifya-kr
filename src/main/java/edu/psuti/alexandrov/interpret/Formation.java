@@ -44,7 +44,7 @@ public record Formation(FormationType type, List<Formation> nested, List<LexUnit
     }
 
     public Optional<LexUnit> orderedUnitOfType(int order, LexType... types) {
-        return Optional.of(unitsListOfType(types))
+        return Optional.of(unitsOfType(types))
                 .map(list -> {
                     try {
                         return list.get(order);
@@ -55,7 +55,7 @@ public record Formation(FormationType type, List<Formation> nested, List<LexUnit
                 });
     }
 
-    public List<LexUnit> unitsListOfType(LexType... types) {
+    public List<LexUnit> unitsOfType(LexType... types) {
         UnitsTypeTree tree = UnitsTypeTree.POOL.get(this);
         return Optional.ofNullable(tree)
                 .or(() -> {
@@ -71,19 +71,28 @@ public record Formation(FormationType type, List<Formation> nested, List<LexUnit
                 .orElseGet(Collections::emptyList);
     }
 
-    public List<LexUnit> unitsListInRange(LexType start, LexType end) {
+
+    private List<LexUnit> unitsOfArea(LexType start, LexType end, int leftOffset, int rightOffset) {
         return orderedUnitOfType(0, start)
                 .flatMap(first -> orderedUnitOfType(0, end)
-                                    .map(last -> {
-                                            try {
-                                                return units.subList(units.indexOf(first),
-                                                                    units.indexOf(last));
-                                            }
-                                            catch (IndexOutOfBoundsException e) {
-                                                return null;
-                                            }
-                                    }))
+                        .map(last -> {
+                            try {
+                                return units.subList(units.indexOf(first) + leftOffset,
+                                        units.indexOf(last) + rightOffset);
+                            }
+                            catch (IndexOutOfBoundsException e) {
+                                return null;
+                            }
+                        }))
                 .orElseGet(Collections::emptyList);
+    }
+
+    public List<LexUnit> unitsOfRange(LexType start, LexType end) {
+        return unitsOfArea(start, end, 0, 0);
+    }
+
+    public List<LexUnit> unitsBetween(LexType start, LexType end) {
+        return unitsOfArea(start, end, 1, 0);
     }
 
     public boolean unitsHaveTypes(int start, int end, LexType... types) {

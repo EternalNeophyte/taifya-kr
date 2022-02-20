@@ -10,13 +10,11 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static edu.psuti.alexandrov.interpret.FormationType.INCORRECT;
@@ -26,31 +24,65 @@ public class UIFrame extends JFrame implements LexHighlighting {
     private static final int TYPE_RATE = 2;
 
     private final JTextPane codePane;
-    private final JTextArea outputArea;
+    private final JTextPane outputPane;
     private final JCheckBox devModeCheckBox;
 
     private final AtomicInteger cursor;
+    private final AtomicBoolean inputReady;
 
     public UIFrame(String title) {
         super(title);
         codePane = setupCodePane();
-        outputArea = setupOutputArea();
+        outputPane = setupOutputPane();
         devModeCheckBox = setupDevModeCheckBox();
         cursor = new AtomicInteger();
+        inputReady = new AtomicBoolean(false);
         setupAllRemaining();
+    }
+
+    public JTextPane codePane() {
+        return codePane;
+    }
+
+    public JTextPane outputPane() {
+        return outputPane;
+    }
+
+    public boolean inputReady() {
+        return inputReady.get();
     }
 
     private JTextPane setupCodePane() {
         JTextPane codePane = new JTextPane();
+        codePane.setFont(new Font("Segoe UI", Font.BOLD, 18));
         codePane.setBounds(0, 0, 1000, 400);
         return codePane;
     }
 
-    private JTextArea setupOutputArea() {
-        JTextArea outputArea = new JTextArea(1, 1);
-        outputArea.setBounds(0, 485, 1000, 220);
-        outputArea.setEditable(false);
-        return outputArea;
+    private JTextPane setupOutputPane() {
+        JTextPane outputPane = new JTextPane();
+        outputPane.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        outputPane.setBounds(0, 485, 1000, 220);
+        outputPane.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    inputReady.set(true);
+                }
+            }
+        });
+        return outputPane;
     }
 
     private JLabel setupOutputLabel() {
@@ -68,17 +100,16 @@ public class UIFrame extends JFrame implements LexHighlighting {
 
             @Override
             public void mouseClicked(MouseEvent e) {
+                inputReady.set(false);
                 RuntimeContext context = LexAnalyzer.setupRuntimeContext(codePane.getText());
-                outputArea.setText("");
+                outputPane.setText("");
                 if(devModeCheckBox.isSelected()) {
-                    context.formations().forEach(f -> outputArea.append(f.toString()));
+                    context.formations().forEach(fm -> writeColoredText(outputPane, fm.toString(), SAKURA_SNOW));
                 }
-                if(context.runWithoutErrors()) {
-                    outputArea.setForeground(SAKURA_SNOW);
-                    context.textHandlers().forEach(handler -> handler.accept(outputArea));
-                }
-                else {
-                    outputArea.setForeground(FIRE);
+                context.runWithoutErrors();
+                    context.uiHandlers().forEach(handler -> handler.accept(UIFrame.this));
+
+                 {
                     context.errors()
                             .forEach((unit, message) -> {
                                 String outputLine = Optional.ofNullable(unit)
@@ -86,7 +117,7 @@ public class UIFrame extends JFrame implements LexHighlighting {
                                         .map(pos -> String.format("Строка %d, cтолбец %d: %s\n",
                                                                     pos.line(), pos.column() , message))
                                         .orElse(message);
-                                outputArea.append(outputLine);
+                                writeColoredText(outputPane, outputLine, FIRE);
                             });
                 }
 
@@ -115,7 +146,7 @@ public class UIFrame extends JFrame implements LexHighlighting {
         setResizable(false);
 
         add(codePane);
-        add(outputArea);
+        add(outputPane);
         add(devModeCheckBox);
         add(setupDevModeLabel());
         add(setupOutputLabel());
@@ -133,9 +164,9 @@ public class UIFrame extends JFrame implements LexHighlighting {
 
     }
 
-    private void addColoredCode(String fragment, Color color) {
-        StyledDocument doc = codePane.getStyledDocument();
-        Style style = codePane.addStyle("", null);
+    public void writeColoredText(JTextPane pane, String fragment, Color color) {
+        StyledDocument doc = pane.getStyledDocument();
+        Style style = pane.addStyle("", null);
         StyleConstants.setForeground(style, color);
         try {
             doc.insertString(doc.getLength(), fragment, style);
@@ -157,10 +188,10 @@ public class UIFrame extends JFrame implements LexHighlighting {
                             .forEach(unit -> {
                                     int end = unit.result().end();
                                     String text = content.substring(cursor.getAndSet(end), end);
-                                    addColoredCode(text, onFire ? FIRE : unit.type().highlight());
+                                    writeColoredText(codePane, text, onFire ? FIRE : unit.type().highlight());
                             });
                 });
-        codePane.setCaretPosition(codePane.getText().length());
+        codePane.setCaretPosition(cursor.get());
     }
 
 }

@@ -2,11 +2,13 @@ package edu.psuti.alexandrov.interpret;
 
 import edu.psuti.alexandrov.lex.IllegalLexException;
 import edu.psuti.alexandrov.lex.LexUnit;
+import edu.psuti.alexandrov.ui.UIFrame;
 import edu.psuti.alexandrov.util.BiBuffer;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -17,7 +19,7 @@ import java.util.function.Consumer;
 public record RuntimeContext(
         Map<String, Container<?>> variables,
         List<Formation> formations,
-        List<Consumer<JTextArea>> textHandlers,
+        List<Consumer<UIFrame>> uiHandlers,
         BiBuffer<LexUnit, String> errors,
         int[] wrapPositions) {
 
@@ -32,6 +34,11 @@ public record RuntimeContext(
         }
         int column = line > 0 ? flatPos - wrapPositions[line - 1] : flatPos;
         return new LexPosition(line + 1, column + 1);
+    }
+
+    public Optional<Container<?>> optionalOfVar(LexUnit varDefinition) {
+        String name = varDefinition.toString();
+        return Optional.ofNullable(variables.get(name));
     }
 
     public boolean hasEnd() {

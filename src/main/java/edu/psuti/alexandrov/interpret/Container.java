@@ -14,6 +14,16 @@ public abstract class Container<T> {
         return value;
     }
 
+    public void put(String newValue) {
+        try {
+            value = parseValue(newValue.replaceAll("\\W", ""));
+        }
+        catch (Throwable e) {
+            throw new IllegalArgumentException("Тип присваиваемого значения не соответствует " +
+                    "типу переменной");
+        }
+    }
+
     public void put(LexUnit newValue) {
         try {
             value = parseValue(newValue.toString());
