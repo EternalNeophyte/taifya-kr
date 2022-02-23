@@ -31,4 +31,9 @@ public class RealContainer extends Container<Double> {
             default -> false;
         };
     }
+
+    @Override
+    String nonNullRepresentaion() {
+        return (value < 0 ? "1_" : "0_") + Integer.toBinaryString(value.intValue());
+    }
 }

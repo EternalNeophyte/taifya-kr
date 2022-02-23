@@ -5,25 +5,29 @@ import edu.psuti.alexandrov.lex.LexUnit;
 import edu.psuti.alexandrov.ui.UIFrame;
 import edu.psuti.alexandrov.util.BiBuffer;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+
+import static edu.psuti.alexandrov.lex.LexType.END_ARGS;
 
 /**
  * Created on 17.01.2022 by
  *
  * @author alexandrov
  */
-public record RuntimeContext(
-        Map<String, Container<?>> variables,
-        List<Formation> formations,
-        List<Consumer<UIFrame>> uiHandlers,
-        BiBuffer<LexUnit, String> errors,
-        int[] wrapPositions) {
+public record RuntimeContext
+        (Map<String, Container<?>> variables,
+         List<Formation> formations,
+         List<Consumer<UIFrame>> uiHandlers,
+         BiBuffer<LexUnit, String> errors,
+         LinkedList<ArithmeticOpPosition> opPositions,
+         int[] wrapPositions)
+{
 
-    //List runnables
+    public RuntimeContext(List<Formation> formations, BiBuffer<LexUnit, String> errors, int[] wrapPositions) {
+        this(new HashMap<>(), formations, new LinkedList<>(), errors, new LinkedList<>(), wrapPositions);
+    }
 
     public static record LexPosition(int line, int column) { }
 
@@ -36,9 +40,14 @@ public record RuntimeContext(
         return new LexPosition(line + 1, column + 1);
     }
 
-    public Optional<Container<?>> optionalOfVar(LexUnit varDefinition) {
-        String name = varDefinition.toString();
-        return Optional.ofNullable(variables.get(name));
+    public static record ArithmeticOpPosition(int start, AtomicInteger end) { }
+
+    public void bindArithmeticOp(int start) {
+        opPositions.add(new ArithmeticOpPosition(start, new AtomicInteger(start)));
+    }
+
+    public void rearrangeArithmeticOp() {
+        opPositions.getLast().end().incrementAndGet();
     }
 
     public boolean hasEnd() {
@@ -53,6 +62,9 @@ public record RuntimeContext(
         if(errors.isEmpty()) {
             try {
                 formations.forEach(formation -> formation.deployIn(this));
+                opPositions.forEach(pos -> {
+                    System.out.println(toPostfixNotation(formations.subList(pos.start + 1, pos.end.get())));
+                });
             }
             catch (IllegalLexException e) {
                 errors.put(e.unit(), e.getMessage());
@@ -63,4 +75,65 @@ public record RuntimeContext(
         }
         return errors.isEmpty();
     }
+
+    public Optional<Container<?>> optionalOfVar(LexUnit varDefinition) {
+        String varName = varDefinition.toString();
+        return Optional.ofNullable(variables.get(varName));
+    }
+
+    public static final Comparator<LexUnit> OPS_BY_PRIORITY = Comparator.comparingInt(RuntimeContext::priorityOfOp);
+
+    public static int priorityOfOp(LexUnit opSignHolder) {
+        String opSign = opSignHolder.toString();
+        return switch (opSign) {
+            case "or", "plus", "minus" -> 1;
+            case "and", "*", "/" -> 2;
+            case "(", ")" -> 3;
+            case "!" -> 4;
+            default -> -1;
+        };
+    }
+
+    public String toPostfixNotation(List<Formation> formations) {
+        StringJoiner result = new StringJoiner(" ");
+        Stack<LexUnit> stack = new Stack<>();
+        for(Formation formation : formations) {
+            //List
+            for(LexUnit unit : formation.units()) {
+                switch(unit.type()) {
+                    case BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM, FLOAT_NUM ->
+                            result.add(unit.toString());
+                    case IDENTIFIER -> optionalOfVar(unit)
+                            .map(c -> {
+                                if(c instanceof BooleanContainer) {
+                                    throw new IllegalArgumentException("Переменная '" + unit +
+                                            "' типа boolean не может быть частью арифметического выражения");
+                                }
+                                return String.valueOf(c.value());
+                            })
+                            .ifPresentOrElse(result::add, () -> {
+                                throw new IllegalLexException("Переменная '" + unit +
+                                        "' еще не была объявлена", unit);
+                            });
+                    case START_ARGS -> stack.push(unit);
+                    case END_ARGS -> {
+                        while (!stack.empty() && !stack.peek().type().equals(END_ARGS)) {
+                            result.add(stack.pop().toString());
+                        }
+                        stack.pop();
+                    }
+                    case ADD_OP, MULTIPLY_OP -> {
+                        while (!stack.empty() && OPS_BY_PRIORITY.compare(stack.peek(), unit) >= 0) {
+                            stack.push(unit);
+                        }
+                    }
+                    default -> throw new IllegalLexException(unit.type() +
+                            " не ожидается здесь [Перевод в постфиксную форму]", unit);
+                }
+            }
+            stack.forEach(unit -> result.add(unit.toString()));
+        }
+        return result.toString();
+    }
+
 }

@@ -1,7 +1,6 @@
 import edu.psuti.alexandrov.exp.Expression;
 import edu.psuti.alexandrov.exp.pattern.WalkPattern;
 import edu.psuti.alexandrov.interpret.FormationType;
-import edu.psuti.alexandrov.lex.LexAnalyzer;
 import edu.psuti.alexandrov.lex.LexType;
 import org.junit.jupiter.api.Test;
 
@@ -115,6 +114,13 @@ public class ParcingTest {
         double d = Double.parseDouble("0.245e-17");
         toString();
 
+    }
+
+    @Test
+    public void testArithm() {
+        var m = FormationType.ARITHMETIC_END_ARGS.expression()
+                .compute(LexType.ADD_OP, LexType.OCTET_NUM);
+        m.toString();
     }
 
 

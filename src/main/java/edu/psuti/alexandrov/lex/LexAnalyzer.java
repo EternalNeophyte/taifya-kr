@@ -41,13 +41,19 @@ public class LexAnalyzer {
                 )
                 .sorted()
                 .collect(LinkedList::new,
-                        (list, unit) -> findFormation(unit, lexBuffer, errBuffer).ifPresent(list::add),
+                        (list, unit) -> findFormation(unit, lexBuffer, errBuffer)
+                                .ifPresent(found -> {
+                                    var constraints = found.type().advanceConstraints();
+                                    if(!constraints.isEmpty() && !constraints.contains(list.getLast().type())) {
+                                        errBuffer.put(unit, found.type() + " не ожидается здесь [Проверка ограничений]");
+                                    }
+                                    list.add(found);
+                                }),
                         LinkedList::addAll);
         if(!lexBuffer.isEmpty()) {
             formations.add(Formation.of(FormationType.INCORRECT, lexBuffer.firstHalf()));
         }
-        return new RuntimeContext(new HashMap<>(), formations,
-                                new LinkedList<>(), errBuffer, wrapPositions);
+        return new RuntimeContext(formations, errBuffer, wrapPositions);
     }
 
     public static Optional<Formation> findFormation(LexUnit unit,
@@ -65,7 +71,7 @@ public class LexAnalyzer {
                                 }
                                 case PARTIAL -> null;
                                 case NO -> {
-                                    errBuffer.put(unit, unit.type() + " не ожидается здесь");
+                                    errBuffer.put(unit, unit.type() + " не ожидается здесь [Лексический анализ]");
                                     yield null;
                                 }
                             }

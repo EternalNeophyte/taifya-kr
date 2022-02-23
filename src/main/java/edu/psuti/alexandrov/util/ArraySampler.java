@@ -4,13 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntFunction;
 
-public class ArraySampler<T> {
-
-    private IntFunction<T[]> generator;
-
-    private ArraySampler(IntFunction<T[]> generator) {
-        this.generator = generator;
-    }
+public record ArraySampler<T>(IntFunction<T[]> generator) {
 
     public static <T> ArraySampler<T> setup(IntFunction<T[]> generator) {
         return new ArraySampler<>(generator);

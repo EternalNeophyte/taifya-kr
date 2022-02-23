@@ -26,4 +26,9 @@ public class BooleanContainer extends Container<Boolean> {
                                                             opDef + "' для типа boolean");
         };
     }
+
+    @Override
+    String nonNullRepresentaion() {
+        return Boolean.toString(value);
+    }
 }

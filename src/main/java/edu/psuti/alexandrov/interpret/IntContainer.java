@@ -41,4 +41,9 @@ public class IntContainer extends Container<Integer> {
             default -> false;
         };
     }
+
+    @Override
+    String nonNullRepresentaion() {
+        return (value < 0 ? "1_" : "0_") + Integer.toBinaryString(value);
+    }
 }

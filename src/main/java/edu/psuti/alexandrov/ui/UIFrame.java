@@ -52,6 +52,18 @@ public class UIFrame extends JFrame implements LexHighlighting {
         return inputReady.get();
     }
 
+
+    private JScrollPane wrapIntoScrollable(JTextPane source) {
+        JScrollPane pane = new JScrollPane(source);
+        pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        pane.setViewportBorder(null);
+        pane.setLocation(source.getLocation());
+        Dimension dim = source.getSize();
+        dim.width -= 15;
+        pane.setSize(dim);
+        return pane;
+    }
+
     private JTextPane setupCodePane() {
         JTextPane codePane = new JTextPane();
         codePane.setFont(new Font("Segoe UI", Font.BOLD, 18));
@@ -62,26 +74,13 @@ public class UIFrame extends JFrame implements LexHighlighting {
     private JTextPane setupOutputPane() {
         JTextPane outputPane = new JTextPane();
         outputPane.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        outputPane.setBounds(0, 485, 1000, 220);
-        outputPane.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-
+        outputPane.setBounds(0, 485, 1000, 175);
+        ReleaseKeyListener listener = e -> {
+            if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                inputReady.set(true);
             }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    inputReady.set(true);
-                }
-            }
-        });
+        };
+        outputPane.addKeyListener(listener);
         return outputPane;
     }
 
@@ -95,7 +94,7 @@ public class UIFrame extends JFrame implements LexHighlighting {
         JButton button = new JButton("Запустить");
         button.setBounds(25, 410, 125, 40);
         button.setForeground(SAKURA_SNOW);
-
+        button.setFocusPainted(false);
         button.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -104,7 +103,11 @@ public class UIFrame extends JFrame implements LexHighlighting {
                 RuntimeContext context = LexAnalyzer.setupRuntimeContext(codePane.getText());
                 outputPane.setText("");
                 if(devModeCheckBox.isSelected()) {
+                    writeColoredText(outputPane, "Структура программы", SKY_BLUE);
                     context.formations().forEach(fm -> writeColoredText(outputPane, fm.toString(), SAKURA_SNOW));
+                    writeColoredText(outputPane, "\n\nВычисления в стеке\n", SKY_BLUE);
+
+                    writeColoredText(outputPane, "\n\nВыполнение программы\n", SKY_BLUE);
                 }
                 context.runWithoutErrors();
                     context.uiHandlers().forEach(handler -> handler.accept(UIFrame.this));
@@ -114,7 +117,7 @@ public class UIFrame extends JFrame implements LexHighlighting {
                             .forEach((unit, message) -> {
                                 String outputLine = Optional.ofNullable(unit)
                                         .map(context::computePosition)
-                                        .map(pos -> String.format("Строка %d, cтолбец %d: %s\n",
+                                        .map(pos -> String.format("\nСтрока %d, cтолбец %d: %s",
                                                                     pos.line(), pos.column() , message))
                                         .orElse(message);
                                 writeColoredText(outputPane, outputLine, FIRE);
@@ -145,8 +148,8 @@ public class UIFrame extends JFrame implements LexHighlighting {
         setVisible(true);
         setResizable(false);
 
-        add(codePane);
-        add(outputPane);
+        add(wrapIntoScrollable(codePane));
+        add(wrapIntoScrollable(outputPane));
         add(devModeCheckBox);
         add(setupDevModeLabel());
         add(setupOutputLabel());
@@ -163,6 +166,7 @@ public class UIFrame extends JFrame implements LexHighlighting {
                  .scheduleAtFixedRate(this::highlightAll, 10, 5, TimeUnit.SECONDS);
 
     }
+
 
     public void writeColoredText(JTextPane pane, String fragment, Color color) {
         StyledDocument doc = pane.getStyledDocument();
