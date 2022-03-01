@@ -168,7 +168,7 @@ public enum FormationType implements SubFormations {
                         (first.equals(START_ARGS) && (second.equals(ADD_OP) || second.equals(MULTIPLY_OP))) ) {
                     throw new IllegalLexException("Выражение не может начинаться со знака бинарной операции", units.get(0));
                 }
-                String s = context.toPostfixNotation(units);
+                String s = context.toRpnString(units);
                 int i;
             }),*/
 

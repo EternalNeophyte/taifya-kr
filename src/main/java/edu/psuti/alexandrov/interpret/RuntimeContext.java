@@ -78,7 +78,7 @@ public record RuntimeContext
     //Reverse Polish notation, RPN
     public void forEachRpn(Consumer<String> consumer) {
         opPositions.forEach(pos -> {
-            String notation = toPostfixNotation(formations.subList(pos.start, pos.end.get()));
+            String notation = toRpnString(formations.subList(pos.start, pos.end.get()));
             consumer.accept(notation);
         });
     }
@@ -101,8 +101,10 @@ public record RuntimeContext
         };
     }
 
-    public String toPostfixNotation(List<Formation> formations) {
-        StringJoiner result = new StringJoiner(" ");
+    public String toRpnString(List<Formation> formations) {
+        StringJoiner rpn = new StringJoiner(" ");
+        //"Операнды в двоичном представлении"
+        StringJoiner binaries = new StringJoiner("\n\t");
         Stack<LexUnit> stack = new Stack<>();
         for(Formation formation : formations) {
             var units = formation.units();
@@ -110,8 +112,11 @@ public record RuntimeContext
                                     ? units.subList(2, units.size())
                                     : units) {
                 switch(unit.type()) {
-                    case BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM, FLOAT_NUM ->
-                            result.add(unit.toString());
+                    case BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM, FLOAT_NUM -> {
+                        String value = unit.toString();
+                        rpn.add(value);
+                        binaries.add(value);
+                    }
                     case IDENTIFIER -> optionalOfVar(unit)
                             .map(c -> {
                                 if(c instanceof BooleanContainer) {
@@ -124,14 +129,14 @@ public record RuntimeContext
                                 }
                                 return c.value.toString();
                             })
-                            .ifPresentOrElse(result::add, () -> {
+                            .ifPresentOrElse(rpn::add, () -> {
                                 throw new IllegalLexException("Переменная '" + unit +
                                             "' еще не была объявлена", unit);
                             });
                     case START_ARGS -> stack.push(unit);
                     case END_ARGS -> {
                         while (!stack.empty() && !stack.peek().type().equals(START_ARGS)) {
-                            result.add(stack.pop().toString());
+                            rpn.add(stack.pop().toString());
                         }
                         if(!stack.empty()) {
                             stack.pop();
@@ -141,7 +146,7 @@ public record RuntimeContext
                         while (!stack.empty() && OPS_BY_PRIORITY.compare(stack.peek(), unit) <= 0) {
                             LexUnit popped = stack.pop();
                             if(!popped.type().equals(START_ARGS)) {
-                                result.add(popped.toString());
+                                rpn.add(popped.toString());
                             }
                         }
                         stack.push(unit);
@@ -151,8 +156,17 @@ public record RuntimeContext
                 }
             }
         }
-        stack.forEach(unit -> result.add(unit.toString()));
-        return result.toString();
+        stack.forEach(unit -> rpn.add(unit.toString()));
+        return rpn.toString();
+    }
+
+    public String toBinaryString(LexUnit unit) {
+        //ToDo
+        return switch (unit.type()) {
+            case FLOAT_NUM -> "";
+            case BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM -> "";
+            default -> "";
+        };
     }
 
 }
