@@ -78,7 +78,7 @@ public record RuntimeContext
     //Reverse Polish notation, RPN
     public void forEachRpn(Consumer<String> consumer) {
         opPositions.forEach(pos -> {
-            String notation = toPostfixNotation(formations.subList(pos.start + 1, pos.end.get() + 1));
+            String notation = toPostfixNotation(formations.subList(pos.start, pos.end.get()));
             consumer.accept(notation);
         });
     }

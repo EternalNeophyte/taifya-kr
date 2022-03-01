@@ -82,7 +82,7 @@ public enum FormationType implements SubFormations {
                 String name = id.toString();
                 Container<?> container = context.variables().get(name);
                 if(nonNull(container)) {
-                    context.bindArithmeticOp(formation.units().indexOf(id));
+                    context.bindArithmeticOp(context.formations().indexOf(formation));
                     context.rearrangeArithmeticOp();
                 }
                 else {
