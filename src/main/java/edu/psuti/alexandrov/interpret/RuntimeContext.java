@@ -128,17 +128,21 @@ public record RuntimeContext
                         while (!stack.empty() && !stack.peek().type().equals(START_ARGS)) {
                             result.add(stack.pop().toString());
                         }
-                        stack.pop();
+                        if(!stack.empty()) {
+                            stack.pop();
+                        }
                     }
                     case ADD_OP, MULTIPLY_OP, UNARY_OP -> {
-                        while (!stack.empty() && OPS_BY_PRIORITY.compare(stack.peek(), unit) >= 0) {
-                            result.add(stack.pop().toString());
+                        while (!stack.empty() && OPS_BY_PRIORITY.compare(stack.peek(), unit) <= 0) {
+                            LexUnit popped = stack.pop();
+                            if(!popped.type().equals(START_ARGS)) {
+                                result.add(popped.toString());
+                            }
                         }
                         stack.push(unit);
                     }
                     default -> throw new IllegalLexException(unit.type() +
                             " не ожидается здесь [Перевод в постфиксную форму]", unit);
-                    //ToDo баг со скобками
                 }
             }
         }
