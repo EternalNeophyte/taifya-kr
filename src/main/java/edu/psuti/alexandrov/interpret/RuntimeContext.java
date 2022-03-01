@@ -57,25 +57,30 @@ public record RuntimeContext
                                                     .type().equals(FormationType.END);
     }
 
-    public boolean runWithoutErrors() {
+    public boolean runWithNoErrors() {
         if(!hasEnd()) {
-            errors.put(null, "Не найден 'END' в конце программы");
+            errors.put(null, "Не найден 'end' в конце программы");
         }
         if(errors.isEmpty()) {
             try {
                 formations.forEach(formation -> formation.deployIn(this));
-                opPositions.forEach(pos -> {
-                    System.out.println(toPostfixNotation(formations.subList(pos.start + 1, pos.end.get() + 1)));
-                });
             }
             catch (IllegalLexException e) {
                 errors.put(e.unit(), e.getMessage());
             }
-            catch (RuntimeException e) {
+            catch (Throwable e) {
                 errors.put(null, e.getMessage());
             }
         }
         return errors.isEmpty();
+    }
+
+    //Reverse Polish notation, RPN
+    public void forEachRpn(Consumer<String> consumer) {
+        opPositions.forEach(pos -> {
+            String notation = toPostfixNotation(formations.subList(pos.start + 1, pos.end.get() + 1));
+            consumer.accept(notation);
+        });
     }
 
     public Optional<Container<?>> optionalOfVar(LexUnit varDefinition) {

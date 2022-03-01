@@ -105,29 +105,35 @@ public class UIFrame extends JFrame implements LexHighlighting {
                 if(devModeCheckBox.isSelected()) {
                     writeColoredText(outputPane, "Структура программы", SKY_BLUE);
                     context.formations().forEach(fm -> writeColoredText(outputPane, fm.toString(), SAKURA_SNOW));
-                    writeColoredText(outputPane, "\n\nВычисления в стеке\n", SKY_BLUE);
-
-                    writeColoredText(outputPane, "\n\nВыполнение программы\n", SKY_BLUE);
+                    runAndThen(context, () -> {
+                        writeColoredText(outputPane, "\n\nПОЛИЗ найденных арифметических выражений\n", SKY_BLUE);
+                        context.forEachRpn(rpn -> writeColoredText(outputPane, rpn + "\n", ARCTIC_GRASS));
+                    });
                 }
-                context.runWithoutErrors();
-                    context.uiHandlers().forEach(handler -> handler.accept(UIFrame.this));
-
-                 {
-                    context.errors()
-                            .forEach((unit, message) -> {
-                                String outputLine = Optional.ofNullable(unit)
-                                        .map(context::computePosition)
-                                        .map(pos -> String.format("\nСтрока %d, cтолбец %d: %s",
-                                                                    pos.line(), pos.column() , message))
-                                        .orElse(message);
-                                writeColoredText(outputPane, outputLine, FIRE);
-                            });
+                else {
+                    runAndThen(context, () -> { });
                 }
-
+                context.uiHandlers().forEach(handler -> handler.accept(UIFrame.this));
             }
 
         });
         return button;
+    }
+
+    private void runAndThen(RuntimeContext context, Runnable action) {
+        if(context.runWithNoErrors()) {
+            action.run();
+        }
+        else {
+            context.errors().forEach((unit, message) -> {
+                String outputLine = Optional.ofNullable(unit)
+                        .map(context::computePosition)
+                        .map(pos -> String.format("\nСтрока %d, cтолбец %d: %s",
+                                pos.line(), pos.column() , message))
+                        .orElse(message);
+                writeColoredText(outputPane, outputLine, FIRE);
+            });
+        }
     }
 
     private JCheckBox setupDevModeCheckBox() {
@@ -181,6 +187,7 @@ public class UIFrame extends JFrame implements LexHighlighting {
     }
 
     private void highlightAll() {
+        int caretPos = codePane.getCaretPosition();
         String content = codePane.getText();
         codePane.setText("");
         cursor.set(0);
@@ -195,7 +202,7 @@ public class UIFrame extends JFrame implements LexHighlighting {
                                     writeColoredText(codePane, text, onFire ? FIRE : unit.type().highlight());
                             });
                 });
-        codePane.setCaretPosition(cursor.get());
+        codePane.setCaretPosition(cursor.get() - TYPE_RATE > caretPos ? cursor.get() : caretPos);
     }
 
 }
