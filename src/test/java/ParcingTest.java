@@ -123,5 +123,11 @@ public class ParcingTest {
         m.toString();
     }
 
+    @Test
+    public void testSplit() {
+        var s = "rewghhte".split("\\W+");
+        s.toString();
+    }
+
 
 }

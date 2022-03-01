@@ -70,9 +70,9 @@ public enum FormationType implements SubFormations {
     VAR_ASSIGN_VALUE("Операция присваивания",
             LexType.expression()
             .maybeOne(ASSIGN_DEF)
-                    .maybeOne(START_ARGS)
             .one(IDENTIFIER)
             .one(ASSIGN_OP)
+            .maybeOne(START_ARGS)
             .one(OPERAND),
 
             NO_CONSTRAINTS,
@@ -83,7 +83,7 @@ public enum FormationType implements SubFormations {
                 Container<?> container = context.variables().get(name);
                 if(nonNull(container)) {
                     context.bindArithmeticOp(formation.units().indexOf(id));
-                    //container.put(formation.units().get(2));    //после знака =
+                    context.rearrangeArithmeticOp();
                 }
                 else {
                     throw new IllegalLexException("Переменная '" + name +

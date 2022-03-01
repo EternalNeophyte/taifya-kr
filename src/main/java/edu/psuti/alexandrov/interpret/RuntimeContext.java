@@ -9,7 +9,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static edu.psuti.alexandrov.lex.LexType.END_ARGS;
+import static edu.psuti.alexandrov.interpret.FormationType.VAR_ASSIGN_VALUE;
+import static edu.psuti.alexandrov.lex.LexType.START_ARGS;
+import static java.util.Objects.isNull;
 
 /**
  * Created on 17.01.2022 by
@@ -63,7 +65,7 @@ public record RuntimeContext
             try {
                 formations.forEach(formation -> formation.deployIn(this));
                 opPositions.forEach(pos -> {
-                    System.out.println(toPostfixNotation(formations.subList(pos.start + 1, pos.end.get())));
+                    System.out.println(toPostfixNotation(formations.subList(pos.start + 1, pos.end.get() + 1)));
                 });
             }
             catch (IllegalLexException e) {
@@ -90,7 +92,7 @@ public record RuntimeContext
             case "and", "*", "/" -> 2;
             case "(", ")" -> 3;
             case "!" -> 4;
-            default -> -1;
+            default -> throw new IllegalArgumentException(opSignHolder + " не является операцией");
         };
     }
 
@@ -98,41 +100,49 @@ public record RuntimeContext
         StringJoiner result = new StringJoiner(" ");
         Stack<LexUnit> stack = new Stack<>();
         for(Formation formation : formations) {
-            //List
-            for(LexUnit unit : formation.units()) {
+            var units = formation.units();
+            for(LexUnit unit : formation.type().equals(VAR_ASSIGN_VALUE)
+                                    ? units.subList(2, units.size())
+                                    : units) {
                 switch(unit.type()) {
                     case BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM, FLOAT_NUM ->
                             result.add(unit.toString());
                     case IDENTIFIER -> optionalOfVar(unit)
                             .map(c -> {
                                 if(c instanceof BooleanContainer) {
-                                    throw new IllegalArgumentException("Переменная '" + unit +
-                                            "' типа boolean не может быть частью арифметического выражения");
+                                    throw new IllegalLexException("Переменная '" + unit +
+                                            "' типа boolean не может быть частью арифметического выражения", unit);
                                 }
-                                return String.valueOf(c.value());
+                                if(isNull(c.value)) {
+                                    throw new IllegalLexException("Переменной '" + unit +
+                                            "' еще не было присвоено значение", unit);
+                                }
+                                return c.value.toString();
                             })
                             .ifPresentOrElse(result::add, () -> {
                                 throw new IllegalLexException("Переменная '" + unit +
-                                        "' еще не была объявлена", unit);
+                                            "' еще не была объявлена", unit);
                             });
                     case START_ARGS -> stack.push(unit);
                     case END_ARGS -> {
-                        while (!stack.empty() && !stack.peek().type().equals(END_ARGS)) {
+                        while (!stack.empty() && !stack.peek().type().equals(START_ARGS)) {
                             result.add(stack.pop().toString());
                         }
                         stack.pop();
                     }
-                    case ADD_OP, MULTIPLY_OP -> {
+                    case ADD_OP, MULTIPLY_OP, UNARY_OP -> {
                         while (!stack.empty() && OPS_BY_PRIORITY.compare(stack.peek(), unit) >= 0) {
-                            stack.push(unit);
+                            result.add(stack.pop().toString());
                         }
+                        stack.push(unit);
                     }
                     default -> throw new IllegalLexException(unit.type() +
                             " не ожидается здесь [Перевод в постфиксную форму]", unit);
+                    //ToDo баг со скобками
                 }
             }
-            stack.forEach(unit -> result.add(unit.toString()));
         }
+        stack.forEach(unit -> result.add(unit.toString()));
         return result.toString();
     }
 
