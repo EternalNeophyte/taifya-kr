@@ -30,9 +30,32 @@ public final class OpUtil {
         };
     }
 
-    public static String toExpResult() {
-        //ToDo exp res
-        return "";
+    private static double executeOp(String opSign, double first, double second) {
+        return switch (opSign) {
+            case "or" -> (int) first | (int) second;
+            case "plus" -> first + second;
+            case "minus" -> first - second;
+            case "and" -> (int) first & (int) second;
+            case "*" -> first * second;
+            case "/" -> first == 0d || second == 0d ? 0d : first / second;
+            default -> 0d;
+        };
+    }
+
+    public static double calculate(String rpn) {
+        Stack<Double> currencies = new Stack<>();
+        for(String part : rpn.split(" ")) {
+            if(part.equals("!")) {
+                int last = currencies.empty() ? 0 : currencies.pop().intValue();
+                currencies.push((double) ~last);
+            }
+            else {
+                double first = currencies.empty() ? 0d : currencies.pop(),
+                        second = currencies.empty() ? 0d : currencies.pop();
+                currencies.push(executeOp(part, first, second));
+            }
+        }
+        return currencies.pop();
     }
 
     public static String toRpnString(RuntimeContext context, List<Formation> formations) {
