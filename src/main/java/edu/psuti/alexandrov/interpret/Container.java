@@ -76,6 +76,6 @@ public abstract class Container<T> {
 
     @Override
     public String toString() {
-        return "Значение [" + (isNull(value) ? "нет" : nonNullRepresentaion()) + "]";
+        return "Значение переменной [" + (isNull(value) ? "нет" : nonNullRepresentaion()) + "]";
     }
 }

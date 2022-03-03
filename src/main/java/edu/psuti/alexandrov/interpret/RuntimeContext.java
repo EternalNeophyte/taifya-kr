@@ -9,9 +9,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static edu.psuti.alexandrov.interpret.FormationType.VAR_ASSIGN_VALUE;
-import static edu.psuti.alexandrov.lex.LexType.START_ARGS;
-import static java.util.Objects.isNull;
+import static edu.psuti.alexandrov.util.OpUtil.toRpnString;
 
 /**
  * Created on 17.01.2022 by
@@ -78,7 +76,7 @@ public record RuntimeContext
     //Reverse Polish notation, RPN
     public void forEachRpn(Consumer<String> consumer) {
         opPositions.forEach(pos -> {
-            String notation = toRpnString(formations.subList(pos.start, pos.end.get()));
+            String notation = toRpnString(this, formations.subList(pos.start, pos.end.get()));
             consumer.accept(notation);
         });
     }
@@ -86,87 +84,6 @@ public record RuntimeContext
     public Optional<Container<?>> optionalOfVar(LexUnit varDefinition) {
         String varName = varDefinition.toString();
         return Optional.ofNullable(variables.get(varName));
-    }
-
-    public static final Comparator<LexUnit> OPS_BY_PRIORITY = Comparator.comparingInt(RuntimeContext::priorityOfOp);
-
-    public static int priorityOfOp(LexUnit opSignHolder) {
-        String opSign = opSignHolder.toString();
-        return switch (opSign) {
-            case "or", "plus", "minus" -> 1;
-            case "and", "*", "/" -> 2;
-            case "(", ")" -> 3;
-            case "!" -> 4;
-            default -> throw new IllegalArgumentException(opSignHolder + " не является операцией");
-        };
-    }
-
-    public String toRpnString(List<Formation> formations) {
-        StringJoiner rpn = new StringJoiner(" ");
-        //"Операнды в двоичном представлении"
-        StringJoiner binaries = new StringJoiner("\n\t");
-        Stack<LexUnit> stack = new Stack<>();
-        for(Formation formation : formations) {
-            var units = formation.units();
-            for(LexUnit unit : formation.type().equals(VAR_ASSIGN_VALUE)
-                                    ? units.subList(2, units.size())
-                                    : units) {
-                switch(unit.type()) {
-                    case BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM, FLOAT_NUM -> {
-                        String value = unit.toString();
-                        rpn.add(value);
-                        binaries.add(value);
-                    }
-                    case IDENTIFIER -> optionalOfVar(unit)
-                            .map(c -> {
-                                if(c instanceof BooleanContainer) {
-                                    throw new IllegalLexException("Переменная '" + unit +
-                                            "' типа boolean не может быть частью арифметического выражения", unit);
-                                }
-                                if(isNull(c.value)) {
-                                    throw new IllegalLexException("Переменной '" + unit +
-                                            "' еще не было присвоено значение", unit);
-                                }
-                                return c.value.toString();
-                            })
-                            .ifPresentOrElse(rpn::add, () -> {
-                                throw new IllegalLexException("Переменная '" + unit +
-                                            "' еще не была объявлена", unit);
-                            });
-                    case START_ARGS -> stack.push(unit);
-                    case END_ARGS -> {
-                        while (!stack.empty() && !stack.peek().type().equals(START_ARGS)) {
-                            rpn.add(stack.pop().toString());
-                        }
-                        if(!stack.empty()) {
-                            stack.pop();
-                        }
-                    }
-                    case ADD_OP, MULTIPLY_OP, UNARY_OP -> {
-                        while (!stack.empty() && OPS_BY_PRIORITY.compare(stack.peek(), unit) <= 0) {
-                            LexUnit popped = stack.pop();
-                            if(!popped.type().equals(START_ARGS)) {
-                                rpn.add(popped.toString());
-                            }
-                        }
-                        stack.push(unit);
-                    }
-                    default -> throw new IllegalLexException(unit.type() +
-                            " не ожидается здесь [Перевод в постфиксную форму]", unit);
-                }
-            }
-        }
-        stack.forEach(unit -> rpn.add(unit.toString()));
-        return rpn.toString();
-    }
-
-    public String toBinaryString(LexUnit unit) {
-        //ToDo
-        return switch (unit.type()) {
-            case FLOAT_NUM -> "";
-            case BINARY_NUM, OCTET_NUM, DECIMAL_NUM, HEX_NUM -> "";
-            default -> "";
-        };
     }
 
 }

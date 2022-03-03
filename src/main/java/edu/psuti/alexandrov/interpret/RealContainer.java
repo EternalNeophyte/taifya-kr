@@ -1,5 +1,7 @@
 package edu.psuti.alexandrov.interpret;
 
+import edu.psuti.alexandrov.util.OpUtil;
+
 public class RealContainer extends Container<Double> {
 
     @Override
@@ -34,6 +36,6 @@ public class RealContainer extends Container<Double> {
 
     @Override
     String nonNullRepresentaion() {
-        return (value < 0 ? "1_" : "0_") + Integer.toBinaryString(value.intValue());
+        return OpUtil.toSignedBinaryString(value.intValue());
     }
 }

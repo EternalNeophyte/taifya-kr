@@ -125,7 +125,7 @@ public class ParcingTest {
 
     @Test
     public void testSplit() {
-        var s = "rewghhte".split("\\W+");
+        var s = Integer.toBinaryString(7);
         s.toString();
     }
 

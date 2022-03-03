@@ -106,7 +106,7 @@ public class UIFrame extends JFrame implements LexHighlighting {
                     writeColoredText(outputPane, "Структура программы", SKY_BLUE);
                     context.formations().forEach(fm -> writeColoredText(outputPane, fm.toString(), SAKURA_SNOW));
                     runAndThen(context, () -> {
-                        writeColoredText(outputPane, "\n\nПОЛИЗ найденных арифметических выражений\n", SKY_BLUE);
+                        writeColoredText(outputPane, "\n\nПОЛИЗ распознанных арифметических выражений\n", SKY_BLUE);
                         context.forEachRpn(rpn -> writeColoredText(outputPane, rpn + "\n", ARCTIC_GRASS));
                     });
                 }
@@ -151,8 +151,6 @@ public class UIFrame extends JFrame implements LexHighlighting {
     private void setupAllRemaining() {
         setSize(1000, 700);
         setLayout(null);
-        setVisible(true);
-        setResizable(false);
 
         add(wrapIntoScrollable(codePane));
         add(wrapIntoScrollable(outputPane));
@@ -171,6 +169,8 @@ public class UIFrame extends JFrame implements LexHighlighting {
         Executors.newSingleThreadScheduledExecutor()
                  .scheduleAtFixedRate(this::highlightAll, 10, 5, TimeUnit.SECONDS);
 
+        setVisible(true);
+        setResizable(false);
     }
 
 

@@ -123,7 +123,7 @@ public record Formation(FormationType type, List<Formation> nested, List<LexUnit
         StringBuilder sb = new StringBuilder("\n").append(type);
         for(int i = 0; i < units.size(); i++) {
             LexUnit unit = units.get(i);
-            sb.append(String.format("\n%3d. %s [%s]", i + 1, unit.type(), unit));
+            sb.append(String.format("\n\t%3d. %s [%s]", i + 1, unit.type(), unit));
         }
         if(!nested.isEmpty()) {
             sb.append("Вложенные конструкции (").append(type)

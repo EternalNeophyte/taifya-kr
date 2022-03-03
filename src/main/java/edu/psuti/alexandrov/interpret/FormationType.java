@@ -84,6 +84,7 @@ public enum FormationType implements SubFormations {
                 if(nonNull(container)) {
                     context.bindArithmeticOp(context.formations().indexOf(formation));
                     context.rearrangeArithmeticOp();
+                    //ToDo логику по вычислению и присвоению значений
                 }
                 else {
                     throw new IllegalLexException("Переменная '" + name +
